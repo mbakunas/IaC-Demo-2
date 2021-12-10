@@ -1,0 +1,212 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualNetwork_name": {
+            "type": "string",
+            "defaultValue": "SPOKE-PROD-EastUS2-01"
+        },
+        "virtualNetwork_addressSpace": {
+            "type": "string",
+            "defaultValue": "192.168.12.0/16"
+        },
+        "subnet_appGW_name": {
+            "type": "string",
+            "defaultValue": "AppGW-192.168.12.0_16"
+        },
+        "subnet_appGW_addressSpace": {
+            "type": "string",
+            "defaultValue": "192.168.12.0/24"
+        },
+        "nsg_appGW_name": {
+            "type": "string"
+        },
+        "subnet_1_name": {
+            "type": "string",
+            "defaultValue": "Subnet1-192.168.14.0_23"
+        },
+        "subnet_1_addressSpace": {
+            "type": "string",
+            "defaultValue": "192.168.14.0/23"
+        },
+        "nsg_1_name": {
+            "type": "string"
+        },
+        "subnet_2_name": {
+            "type": "string",
+            "defaultValue": "Subnet2-192.168.16.0_23"
+        },
+        "subnet_2_addressSpace": {
+            "type": "string",
+            "defaultValue": "192.168.16.0/23"
+        },
+        "nsg_2_name": {
+            "type": "string"
+        },
+        "subnet_3_name": {
+            "type": "string",
+            "defaultValue": "Subnet3-192.168.18.0_23"
+        },
+        "subnet_3_addressSpace": {
+            "type": "string",
+            "defaultValue": "192.168.18.0/23"
+        },
+        "nsg_3_name": {
+            "type": "string"
+        },
+        "configureRouteTable": {
+            "type": "bool",
+            "defaultValue": false
+        },
+        "routeTableName": {
+            "type": "string"
+        },
+        "ddosPlanId": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "eastus2"
+        }
+    },
+    "variables": {
+        "routeTableIdJSON": "[json(concat('{\"id\": \"', resourceId('Microsoft.Network/routeTables', parameters('routeTableName')), '\"}'))]",
+        "ddosPlanIdJSON": "[json(concat('{\"id\": \"', parameters('ddosPlanId'), '\"}'))]"
+    },
+    "resources": [
+        {
+            "comments": "VNet",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2020-05-01",
+            "location": "[parameters('location')]",
+            "tags": "[resourceGroup().tags]",
+            "name": "[parameters('virtualNetwork_name')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsg_1_name'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsg_2_name'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsg_3_name'))]"
+            ],
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('virtualNetwork_addressSpace')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[parameters('subnet_appGW_name')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('subnet_appGW_addressSpace')]",
+                            "serviceEndpoints": [],
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsg_1_name'))]"
+                            },
+                            "routeTable": "[if(parameters('configureRouteTable'), variables('routeTableIdJSON'), json('null'))]"
+                        }
+                    },
+                    {
+                        "name": "[parameters('subnet_1_name')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('subnet_1_addressSpace')]",
+                            "serviceEndpoints": [],
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsg_1_name'))]"
+                            },
+                            "routeTable": "[if(parameters('configureRouteTable'), variables('routeTableIdJSON'), json('null'))]"
+                        }
+                    },
+                    {
+                        "name": "[parameters('subnet_2_name')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('subnet_2_addressSpace')]",
+                            "serviceEndpoints": [],
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsg_2_name'))]"
+                            },
+                            "routeTable": "[if(parameters('configureRouteTable'), variables('routeTableIdJSON'), json('null'))]"
+                        }
+                    },
+                    {
+                        "name": "[parameters('subnet_3_name')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('subnet_2_addressSpace')]",
+                            "serviceEndpoints": [],
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsg_3_name'))]"
+                            },
+                            "routeTable": "[if(parameters('configureRouteTable'), variables('routeTableIdJSON'), json('null'))]"
+                        }
+                    }
+                ],
+                "virtualNetworkPeerings": [],
+                "enableDdosProtection": "[if(equals(parameters('ddosPlanId'), 'Skip'), 'false', 'true')]",
+                "enableVmProtection": false,
+                "ddosProtectionPlan": "[if(equals(parameters('ddosPlanId'), 'Skip'), json('null'), variables('ddosPlanIdJSON'))]"
+            }
+        },
+        {
+            "comments": "App GW Subnet NSG",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2020-05-01",
+            "name": "[parameters('nsg_appGW_name')]",
+            "location": "[parameters('location')]",
+            "tags": "[resourceGroup().tags]",
+            "properties": {
+                "securityRules": []
+            }
+        },
+        {
+            "comments": "Subnet 1 NSG",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2020-05-01",
+            "name": "[parameters('nsg_1_name')]",
+            "location": "[parameters('location')]",
+            "tags": "[resourceGroup().tags]",
+            "properties": {
+                "securityRules": []
+            }
+        },
+        {
+            "comments": "Subnet 2 NSG",
+            "condition": "[not(equals(parameters('subnet_2_addressSpace'), '0.0.0.0/0'))]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2020-05-01",
+            "name": "[parameters('nsg_2_name')]",
+            "location": "[parameters('location')]",
+            "tags": "[resourceGroup().tags]",
+            "properties": {
+                "securityRules": []
+            }
+        },
+        {
+            "comments": "Subnet 3 NSG",
+            "condition": "[and(not(equals(parameters('subnet_2_addressSpace'), '0.0.0.0/0')), not(equals(parameters('subnet_3_addressSpace'), '0.0.0.0/0')))]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2020-05-01",
+            "name": "[parameters('nsg_3_name')]",
+            "location": "[parameters('location')]",
+            "tags": "[resourceGroup().tags]",
+            "properties": {
+                "securityRules": []
+            }
+        }
+    ],
+    "outputs": {
+        "vNetId": {
+            "type": "string",
+            "value": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetwork_name'))]"
+        }
+    }
+}
