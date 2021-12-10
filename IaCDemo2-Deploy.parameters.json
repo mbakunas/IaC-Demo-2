@@ -1,0 +1,66 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "assetLocationURI": {
+            "value": "https://raw.githubusercontent.com/mbakunas/IaC-Demo-2/main/"
+        },
+        "hubVNet_Name": {
+            "value": "Hub-EastUS2-01"
+        },
+        "hubVNet_AddressSpace": {
+            "value": "10.0.0.0/23"
+        },
+        "hubVnet_GatewaySubnet_AddressSpace": {
+            "value": "10.0.0.0/26"
+        },
+        "hubVNet_FirewallSubnet_AddressSpace": {
+            "value": "10.0.0.64/26"
+        },
+        "hubVNet_BastionSubnet_AddressSpace": {
+            "value": "10.0.0.128/26"
+        },
+        "hubVNet_subnetDC_name": {
+            "value": "Infra-10.0.0.192_27"
+        },
+        "hubVNet_subnetDC_addressSpace": {
+            "value": "10.0.0.192/27"
+        },
+        "hubVNet_subnet1_name": {
+            "value": "CorpNet-10.0.1.0_27"
+        },
+        "hubVNet_subnet1_addressSpace": {
+            "value": "10.0.1.0/27"
+        },
+        "spoke1VNet_Name": {
+            "value": "Spoke-Prod-EastUS2-01"
+        },
+        "spoke1VNet_AddressSpace": {
+            "value": "10.1.0.0/16"
+        },
+        "spoke1VNet_subnetAppGW_name": {
+            "value": "AppGW-10.1.0.0_24"
+        },
+        "spoke1VNet_subnetAppGW_addressSpace": {
+            "value": "10.1.0.0/24"
+        },
+        "spoke1VNet_subnet1_name": {
+            "value": "WebTier-10.1.2.0_23"
+        },
+        "spoke1VNet_subnet1_addressSpace": {
+            "value": "10.1.2.0/23"
+        },
+        "spoke1VNet_subnet2_name": {
+            "value": "AppTier-10.1.4.0_23"
+        },
+        "spoke1VNet_subnet2_addressSpace": {
+            "value": "10.1.4.0/23"
+        },
+        "spoke1VNet_subnet3_name": {
+            "value": "DataTier_10.1.6.0_23"
+        },
+        "spoke1VNet_subnet3_addressSpace": {
+            "value": "10.1.6.0/23"
+        }
+    }
+}

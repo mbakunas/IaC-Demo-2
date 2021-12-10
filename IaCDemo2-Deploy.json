@@ -1,0 +1,184 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "assetLocationURI": {
+            "type": "string"
+        },
+        "hubVNet_Name": {
+            "type": "string"
+        },
+        "hubVNet_AddressSpace": {
+            "type": "string"
+        },
+        "hubVnet_GatewaySubnet_AddressSpace": {
+            "type": "string"
+        },
+        "hubVNet_FirewallSubnet_AddressSpace": {
+            "type": "string"
+        },
+        "hubVNet_BastionSubnet_AddressSpace": {
+            "type": "string"
+        },
+        "hubVNet_subnetDC_name": {
+            "type": "string"
+        },
+        "hubVNet_subnetDC_addressSpace": {
+            "type": "string"
+        },
+        "hubVNet_subnet1_name": {
+            "type": "string"
+        },
+        "hubVNet_subnet1_addressSpace": {
+            "type": "string"
+        },
+        "spoke1VNet_Name": {
+            "type": "string"
+        },
+        "spoke1VNet_AddressSpace": {
+            "type": "string"
+        },
+        "spoke1VNet_subnetAppGW_name": {
+            "type": "string"
+        },
+        "spoke1VNet_subnetAppGW_addressSpace": {
+            "type": "string"
+        },
+        "spoke1VNet_subnet1_name": {
+            "type": "string"
+        },
+        "spoke1VNet_subnet1_addressSpace": {
+            "type": "string"
+        },
+        "spoke1VNet_subnet2_name": {
+            "type": "string"
+        },
+        "spoke1VNet_subnet2_addressSpace": {
+            "type": "string"
+        },
+        "spoke1VNet_subnet3_name": {
+            "type": "string"
+        },
+        "spoke1VNet_subnet3_addressSpace": {
+            "type": "string"
+        }
+
+    },
+    "variables": {
+        "constants": {
+            "location": "[resourceGroup().location]",
+            "templateLocationURI": "[concat(parameters('assetLocationURI'), 'Templates/')]",
+            "configureRouteTable": false,
+            "routeTableName": "Foo"
+        },
+        "deploymentName": "[deployment().name]",
+        "deploymentNames": {
+            "VNetHub": "[concat(variables('deploymentName'), '-VNet-Hub')]",
+            "VNetSpoke1": "[concat(variables('deploymentName'), '-VNet-Spoke1')]",
+            "VNetSpoke2": "[concat(variables('deploymentName'), '-VNet-Spoke2')]"
+        }
+    },
+    "functions": [
+        {
+            "namespace": "function",
+            "members": {
+                // This function appends -NSG onto the supplied parameter which is intended to be the subnet name
+                "nsgName": {
+                    "parameters": [
+                        {
+                            "name": "subnetName",
+                            "type": "string"
+                        }
+                    ],
+                    "output": {
+                        "value": "[concat(parameters('subnetName'), '-NSG')]",
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    ],
+    "resources": [
+        // VNets
+        {
+            "comments": "Hub VNet",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "name": "[variables('deploymentNames').VNetHub]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('constants').templateLocationURI, 'IaCDemo2-VNet-Hub.json')]"
+                },
+                "parameters": {
+                    "virtualNetwork_name": {"value": "[parameters('hubVNet_Name')]"},
+                    "virtualNetwork_addressSpace": {"value": "[parameters('hubVNet_AddressSpace')]"},
+                    "subnet_gateway_addressSpace": {"value": "[parameters('hubVnet_GatewaySubnet_AddressSpace')]"},
+                    "subnet_firewall_addressSpace": {"value": "[parameters('hubVNet_FirewallSubnet_AddressSpace')]"},
+                    "subnet_bastion_addressSpace": {"value": "[parameters('hubVNet_BastionSubnet_AddressSpace')]"},
+                    "subnet_DC_name": {"value": "[parameters('hubVNet_subnetDC_name')]"},
+                    "subnet_DC_addressSpace": {"value": "[parameters('hubVNet_subnetDC_addressSpace')]"},
+                    "nsg_DC_name": {"value": "[function.nsgName(parameters('hubVNet_subnetDC_name'))]"},
+                    "subnet_1_name": {"value": "[parameters('hubVNet_subnet1_name')]"},
+                    "subnet_1_addressSpace": {"value": "[parameters('hubVNet_subnet1_addressSpace')]"},
+                    "nsg_1_name": {"value": "[function.nsgName(parameters('hubVNet_subnet1_name'))]"},
+                    "configureRouteTable": {"value": "[variables('constants').configureRouteTable]"},
+                    "routeTableName": {"value": "[variables('constants').routeTableName]"},
+                    "ddosPlanId": {"value": "Skip"},
+                    "location": {"value": "[variables('constants').location]"}
+                }
+            }
+
+        },
+        {
+            "comments": "Spoke 1 VNet",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "name": "[variables('deploymentNames').VNetSpoke1]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('constants').templateLocationURI, 'IaCDemo2-VNet-Spoke.json')]"
+                },
+                "parameters": {
+                    "virtualNetwork_name": {"value": "[parameters('spoke1VNet_Name')]"},
+                    "virtualNetwork_addressSpace": {"value": "[parameters('spoke1VNet_AddressSpace')]"},
+                    "subnet_appGW_name": {"value": "[parameters('spoke1VNet_subnetAppGW_name')]"},
+                    "subnet_appGW_addressSpace": {"value": "[parameters('spoke1VNet_subnetAppGW_addressSpace')]"},
+                    "nsg_appGW_name": {"value": "[function.nsgName(parameters('spoke1VNet_subnetAppGW_name'))]"},
+                    "subnet_1_name": {"value": "[parameters('spoke1VNet_subnet1_name')]"},
+                    "subnet_1_addressSpace": {"value": "[parameters('spoke1VNet_subnet1_addressSpace')]"},
+                    "nsg_1_name": {"value": "[function.nsgName(parameters('spoke1VNet_subnet1_name'))]"},
+                    "subnet_2_name": {"value": "[parameters('spoke1VNet_subnet2_name')]"},
+                    "subnet_2_addressSpace": {"value": "[parameters('spoke1VNet_subnet2_addressSpace')]"},
+                    "nsg_2_name": {"value": "[function.nsgName(parameters('spoke1VNet_subnet2_name'))]"},
+                    "subnet_3_name": {"value": "[parameters('spoke1VNet_subnet3_name')]"},
+                    "subnet_3_addressSpace": {"value": "[parameters('spoke1VNet_subnet3_addressSpace')]"},
+                    "nsg_3_name": {"value": "[function.nsgName(parameters('spoke1VNet_subnet3_name'))]"},
+                    "configureRouteTable": {"value": "[variables('constants').configureRouteTable]"},
+                    "routeTableName": {"value": "[variables('constants').routeTableName]"},
+                    "ddosPlanId": {"value": "Skip"},
+                    "location": {"value": "[variables('constants').location]"}
+                }
+            }
+        }
+
+        // Route Table
+
+        // VMs
+
+
+        // App service plan and app service
+
+
+        // DNS zone
+
+
+        // Log Analytics workspace
+
+
+        // storage account
+
+    ],
+    "outputs": {}
+}
