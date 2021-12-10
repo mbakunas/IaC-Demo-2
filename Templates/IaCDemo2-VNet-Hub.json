@@ -66,7 +66,7 @@
         {
             "comments": "VNet",
             "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "2020-05-01",
+            "apiVersion": "2020-11-01",
             "name": "[parameters('virtualNetwork_name')]",
             "location": "[parameters('location')]",
             "tags": "[resourceGroup().tags]",
@@ -149,7 +149,7 @@
         {
             "comments": "DCs subnet NSG",
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2020-05-01",
+            "apiVersion": "2020-11-01",
             "name": "[parameters('nsg_DC_name')]",
             "location": "[parameters('location')]",
             "tags": "[resourceGroup().tags]",
@@ -161,7 +161,7 @@
             "comments": "Subnet 1 NSG",
             "condition": "[not(equals(parameters('subnet_1_addressSpace'), '0.0.0.0/0'))]",
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2020-05-01",
+            "apiVersion": "2020-11-01",
             "name": "[parameters('nsg_1_name')]",
             "location": "[parameters('location')]",
             "tags": "[resourceGroup().tags]",
