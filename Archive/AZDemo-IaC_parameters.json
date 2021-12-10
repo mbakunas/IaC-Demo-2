@@ -1,0 +1,600 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "subscriptionId": {
+      "value": "8f617eb6-cc50-43c9-8764-7801f4ce9735"
+    },
+    "location": {
+      "value": "East US"
+    },
+    "sites_AvanadeAZDemo": {
+      "value": {
+        "name": "SellmoreAzureturner",
+        "properties": {
+          "clientCertEnabled": false,
+          "enabled": true,
+          "httpsOnly": true,
+          "clientCertMode": false,
+          "clientAffinityEnabled": false,
+          "siteConfig": {
+            "appSettings": [],
+            "use32BitWorkerProcess": false,
+            "alwaysOn": false,
+            "netFrameworkVersion": "v4.0",
+            "defaultDocuments": [],
+            "connectionStrings": [],
+            "cors": {
+              "allowedOrigins": [],
+              "supportCredentials": false
+            },
+            "detailedErrorLoggingEnabled": false,
+            "ftpsState": "Disabled",
+            "healthCheckPath": null,
+            "http20Enabled": false,
+            "localMySqlEnabled": false,
+            "managedPipelineMode": "Integrated",
+            "minTlsVersion": null,
+            "numberOfWorkers": 0,
+            "remoteDebuggingEnabled": false,
+            "remoteDebuggingVersion": null,
+            "requestTracingEnabled": false,
+            "scmIpSecurityRestrictionsUseMain": false,
+            "scmType": "None",
+            "webSocketsEnabled": false
+          }
+        }
+      }
+    },
+    "serverfarms_AZDemo": {
+      "value": {
+        "name": "AZDemo",
+        "kind": "Windows",
+        "sku": {
+          "name": "S1",
+          "capacity": 1,
+          "tier": "Standard"
+        },
+        "properties": {
+          "perSiteScaling": false,
+          "reserved": false,
+          "maximumElasticWorkerCount": "1"
+        }
+      }
+    },
+    "availabilitySets_App01-AV1": {
+      "value": {
+        "name": "App01-AV1",
+        "properties": {
+          "platformFaultDomainCount": 2,
+          "platformUpdateDomainCount": 5
+        },
+        "sku": {
+          "name": "aligned"
+        }
+      }
+    },
+    "networkSecurityGroups_NSG-DC": {
+      "value": {
+        "name": "NSG-DC",
+        "properties": {
+          "securityRules": [
+            {
+              "properties": {
+                "description": "",
+                "protocol": "TCP",
+                "sourcePortRange": "3389",
+                "destinationPortRange": "3389",
+                "sourceAddressPrefix": "*",
+                "destinationAddressPrefix": "*",
+                "access": "Allow",
+                "priority": "100",
+                "direction": "Inbound"
+              },
+              "name": "AllowRDP"
+            },
+            {
+              "properties": {
+                "description": "",
+                "protocol": "ICMP",
+                "sourcePortRange": "*",
+                "destinationPortRange": "*",
+                "sourceAddressPrefix": "*",
+                "destinationAddressPrefix": "*",
+                "access": "Allow",
+                "priority": "110",
+                "direction": "Inbound"
+              },
+              "name": "AllowPing"
+            }
+          ]
+        }
+      }
+    },
+    "routeTables_default": {
+      "value": {
+        "name": "default",
+        "properties": {
+          "routes": [
+            {
+              "name": "Internet",
+              "properties": {
+                "addressPrefix": "0.0.0.0/8",
+                "nextHopType": "Internet",
+                "nextHopIpAddress": ""
+              }
+            }
+          ]
+        }
+      }
+    },
+    "dnsZones_AvanadeSouth.com": {
+      "value": {
+        "name": "AvanadeSouth.com",
+        "location": "global",
+        "properties": {}
+      }
+    },
+    "virtualNetworks_AZDemo-Hub-EastUS": {
+      "value": {
+        "name": "AZDemo-Hub-EastUS",
+        "properties": {
+          "addressSpace": {
+            "addressPrefixes": [
+              "10.10.0.0/20"
+            ]
+          },
+          "subnets": [
+            {
+              "name": "GatewaySubnet",
+              "properties": {
+                "addressPrefix": "10.10.0.0/28"
+              }
+            },
+            {
+              "name": "SNET_AppGateway",
+              "properties": {
+                "addressPrefix": "10.10.0.32/28"
+              }
+            },
+            {
+              "name": "SNET_DC",
+              "properties": {
+                "addressPrefix": "10.10.0.64/28"
+              }
+            },
+            {
+              "name": "AzureBastionSubnet",
+              "properties": {
+                "addressPrefix": "10.10.0.96/28"
+              }
+            }
+          ],
+          "enableDdosProtection": false
+        }
+      }
+    },
+    "virtualNetworks_AZDemo-Spoke-Prod": {
+      "value": {
+        "name": "AZDemo-Spoke-Prod",
+        "properties": {
+          "addressSpace": {
+            "addressPrefixes": [
+              "10.10.16.0/20"
+            ]
+          },
+          "subnets": [
+            {
+              "name": "SNET_AppServers",
+              "properties": {
+                "addressPrefix": "10.10.16.0/24"
+              }
+            },
+            {
+              "name": "SNET_DBServers",
+              "properties": {
+                "addressPrefix": "10.10.17.0/24"
+              }
+            }
+          ],
+          "enableDdosProtection": false
+        }
+      }
+    },
+    "virtualNetworks_AZDemo-Spoke-NonProd": {
+      "value": {
+        "name": "AZDemo-Spoke-NonProd",
+        "properties": {
+          "addressSpace": {
+            "addressPrefixes": [
+              "10.10.32.0/20"
+            ]
+          },
+          "subnets": [
+            {
+              "name": "SNET_AppServers",
+              "properties": {
+                "addressPrefix": "10.10.32.0/24"
+              }
+            },
+            {
+              "name": "SNET_DBServers",
+              "properties": {
+                "addressPrefix": "10.10.33.0/24"
+              }
+            }
+          ],
+          "enableDdosProtection": false
+        }
+      }
+    },
+    "virtualNetworks_virtualNetworkPeerings_AZDemo-Hub-EastUS_Hub_Prod": {
+      "value": {
+        "name": "Hub_Prod",
+        "properties": {
+          "allowVirtualNetworkAccess": true,
+          "allowForwardedTraffic": true,
+          "allowGatewayTransit": false,
+          "useRemoteGateways": false
+        }
+      }
+    },
+    "virtualNetworks_virtualNetworkPeerings_AZDemo-Spoke-Prod_Prod_Hub": {
+      "value": {
+        "name": "Prod_Hub",
+        "properties": {
+          "allowVirtualNetworkAccess": true,
+          "allowForwardedTraffic": true,
+          "allowGatewayTransit": false,
+          "useRemoteGateways": false
+        }
+      }
+    },
+    "virtualNetworks_virtualNetworkPeerings_AZDemo-Hub-EastUS_Hub_NonProd": {
+      "value": {
+        "name": "Hub_NonProd",
+        "properties": {
+          "allowVirtualNetworkAccess": true,
+          "allowForwardedTraffic": true,
+          "allowGatewayTransit": false,
+          "useRemoteGateways": false
+        }
+      }
+    },
+    "virtualNetworks_virtualNetworkPeerings_AZDemo-Spoke-NonProd_NonProd_Hub": {
+      "value": {
+        "name": "NonProd_Hub",
+        "properties": {
+          "allowVirtualNetworkAccess": true,
+          "allowForwardedTraffic": true,
+          "allowGatewayTransit": false,
+          "useRemoteGateways": false
+        }
+      }
+    },
+    "networkInterfaces_nic-DC-1-vm0": {
+      "value": {
+        "name": "nic-DC-1-vm0",
+        "properties": {
+          "ipConfigurations": [
+            {
+              "name": "ipconfig1",
+              "properties": {
+                "privateIPAllocationMethod": "Dynamic",
+                "applicationSecurityGroups": []
+              }
+            }
+          ],
+          "enableAcceleratedNetworking": false,
+          "enableIPForwarding": false
+        }
+      }
+    },
+    "networkInterfaces_nic-DC-1-vm1": {
+      "value": {
+        "name": "nic-DC-1-vm1",
+        "properties": {
+          "ipConfigurations": [
+            {
+              "name": "ipconfig1",
+              "properties": {
+                "privateIPAllocationMethod": "Dynamic",
+                "applicationSecurityGroups": []
+              }
+            }
+          ],
+          "enableAcceleratedNetworking": false,
+          "enableIPForwarding": false
+        }
+      }
+    },
+    "virtualMachines_DC-10": {
+      "value": {
+        "name": "DC-10",
+        "properties": {
+          "hardwareProfile": {
+            "vmSize": "Standard_D2a_v4"
+          },
+          "LicenseType": "None",
+          "osProfile": {
+            "computerName": "DC-10",
+            "adminUsername": "AvanadeAdmin"
+          },
+          "storageProfile": {
+            "imageReference": {
+              "publisher": "MicrosoftWindowsServer",
+              "offer": "WindowsServer",
+              "sku": "2019-Datacenter",
+              "version": "latest"
+            },
+            "osDisk": {
+              "createOption": "FromImage",
+              "managedDisk": {
+                "storageAccountType": "Standard_LRS"
+              },
+              "caching": "ReadWrite"
+            },
+            "dataDisks": []
+          },
+          "networkProfile": {
+            "networkInterfaces": [
+              {
+                "properties": {
+                  "primary": true
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "virtualMachines_DC-11": {
+      "value": {
+        "name": "DC-11",
+        "properties": {
+          "hardwareProfile": {
+            "vmSize": "Standard_D2a_v4"
+          },
+          "LicenseType": "None",
+          "osProfile": {
+            "computerName": "DC-11",
+            "adminUsername": "AvanadeAdmin"
+          },
+          "storageProfile": {
+            "imageReference": {
+              "publisher": "MicrosoftWindowsServer",
+              "offer": "WindowsServer",
+              "sku": "2019-Datacenter",
+              "version": "latest"
+            },
+            "osDisk": {
+              "createOption": "FromImage",
+              "managedDisk": {
+                "storageAccountType": "Standard_LRS"
+              },
+              "caching": "ReadWrite"
+            },
+            "dataDisks": []
+          },
+          "networkProfile": {
+            "networkInterfaces": [
+              {
+                "properties": {
+                  "primary": true
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "publicIPAddresses_nic-VMDev--vm0-publicip": {
+      "value": {
+        "name": "nic-VMDev--vm0-publicip",
+        "properties": {
+          "publicIPAllocationMethod": "Dynamic",
+          "dnsSettings": {
+            "domainNameLabel": "avanadeazdemovm01"
+          }
+        },
+        "sku": {
+          "name": "Basic"
+        }
+      }
+    },
+    "publicIPAddresses_nic-VMDev--vm1-publicip": {
+      "value": {
+        "name": "nic-VMDev--vm1-publicip",
+        "properties": {
+          "publicIPAllocationMethod": "Dynamic",
+          "dnsSettings": {
+            "domainNameLabel": "avanadeazdemovm02"
+          }
+        },
+        "sku": {
+          "name": "Basic"
+        }
+      }
+    },
+    "networkInterfaces_nic-VMDev--vm0": {
+      "value": {
+        "name": "nic-VMDev--vm0",
+        "properties": {
+          "ipConfigurations": [
+            {
+              "name": "ipconfig1",
+              "properties": {
+                "privateIPAllocationMethod": "Dynamic",
+                "applicationSecurityGroups": []
+              }
+            }
+          ],
+          "enableAcceleratedNetworking": false,
+          "enableIPForwarding": false
+        }
+      }
+    },
+    "networkInterfaces_nic-VMDev--vm1": {
+      "value": {
+        "name": "nic-VMDev--vm1",
+        "properties": {
+          "ipConfigurations": [
+            {
+              "name": "ipconfig1",
+              "properties": {
+                "privateIPAllocationMethod": "Dynamic",
+                "applicationSecurityGroups": []
+              }
+            }
+          ],
+          "enableAcceleratedNetworking": false,
+          "enableIPForwarding": false
+        }
+      }
+    },
+    "virtualMachines_VMDev-0": {
+      "value": {
+        "name": "VMDev-0",
+        "properties": {
+          "hardwareProfile": {
+            "vmSize": "Standard_D4s_v3"
+          },
+          "LicenseType": "None",
+          "osProfile": {
+            "computerName": "VMDev-0",
+            "adminUsername": "AvanadeAdmin"
+          },
+          "storageProfile": {
+            "imageReference": {
+              "publisher": "MicrosoftWindowsServer",
+              "offer": "WindowsServer",
+              "sku": "2019-Datacenter",
+              "version": "latest"
+            },
+            "osDisk": {
+              "createOption": "FromImage",
+              "managedDisk": {
+                "storageAccountType": "Standard_LRS"
+              },
+              "caching": "ReadWrite"
+            },
+            "dataDisks": []
+          },
+          "networkProfile": {
+            "networkInterfaces": [
+              {
+                "properties": {
+                  "primary": true
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "virtualMachines_VMDev-1": {
+      "value": {
+        "name": "VMDev-1",
+        "properties": {
+          "hardwareProfile": {
+            "vmSize": "Standard_D4s_v3"
+          },
+          "LicenseType": "None",
+          "osProfile": {
+            "computerName": "VMDev-1",
+            "adminUsername": "AvanadeAdmin"
+          },
+          "storageProfile": {
+            "imageReference": {
+              "publisher": "MicrosoftWindowsServer",
+              "offer": "WindowsServer",
+              "sku": "2019-Datacenter",
+              "version": "latest"
+            },
+            "osDisk": {
+              "createOption": "FromImage",
+              "managedDisk": {
+                "storageAccountType": "Standard_LRS"
+              },
+              "caching": "ReadWrite"
+            },
+            "dataDisks": []
+          },
+          "networkProfile": {
+            "networkInterfaces": [
+              {
+                "properties": {
+                  "primary": true
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "storageAccounts_devfilestore1": {
+      "value": {
+        "name": "devfilestore1",
+        "kind": "StorageV2",
+        "sku": {
+          "name": "Standard_LRS"
+        },
+        "properties": {
+          "isHnsEnabled": false,
+          "encryption": {
+            "keySource": "Microsoft.Storage",
+            "services": {
+              "blob": {
+                "enabled": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "storageAccounts_fileServices_shares_devfilestore1_default_share1": {
+      "value": {
+        "name": "share1",
+        "tags": {}
+      }
+    },
+    "storageAccounts_blobServices_containers_devfilestore1_default_sqlbackups": {
+      "value": {
+        "name": "sqlbackups",
+        "tags": {}
+      }
+    },
+    "storageAccounts_blobServices_devfilestore1_default": {
+      "value": {
+        "name": "default",
+        "properties": {
+          "deleteRetentionPolicy": {
+            "enabled": false
+          },
+          "isVersioningEnabled": false,
+          "changeFeed": {
+            "enabled": false
+          }
+        }
+      }
+    },
+    "workspaces_LOG-monitor1": {
+      "value": {
+        "name": "LOG-monitor1",
+        "properties": {
+          "sku": {
+            "name": "PerNode"
+          }
+        }
+      }
+    },
+    "KvSecretAvanadeAdmin": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/8f617eb6-cc50-43c9-8764-7801f4ce9735/resourceGroups/CSS/providers/Microsoft.KeyVault/vaults/CSSKeyVault1"
+        },
+        "secretName": "AvanadeAdmin"
+      }
+    }
+  }
+}
