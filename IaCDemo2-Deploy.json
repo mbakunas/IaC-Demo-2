@@ -5,6 +5,8 @@
         "assetLocationURI": {
             "type": "string"
         },
+
+        // Hub VNet
         "hubVNet_Name": {
             "type": "string"
         },
@@ -32,6 +34,8 @@
         "hubVNet_subnet1_addressSpace": {
             "type": "string"
         },
+
+        // Spoke 1 VNet
         "spoke1VNet_Name": {
             "type": "string"
         },
@@ -60,6 +64,38 @@
             "type": "string"
         },
         "spoke1VNet_subnet3_addressSpace": {
+            "type": "string"
+        },
+
+        // Spoke 2 VNet
+        "spoke2VNet_Name": {
+            "type": "string"
+        },
+        "spoke2VNet_AddressSpace": {
+            "type": "string"
+        },
+        "spoke2VNet_subnetAppGW_name": {
+            "type": "string"
+        },
+        "spoke2VNet_subnetAppGW_addressSpace": {
+            "type": "string"
+        },
+        "spoke2VNet_subnet1_name": {
+            "type": "string"
+        },
+        "spoke2VNet_subnet1_addressSpace": {
+            "type": "string"
+        },
+        "spoke2VNet_subnet2_name": {
+            "type": "string"
+        },
+        "spoke2VNet_subnet2_addressSpace": {
+            "type": "string"
+        },
+        "spoke2VNet_subnet3_name": {
+            "type": "string"
+        },
+        "spoke2VNet_subnet3_addressSpace": {
             "type": "string"
         }
 
@@ -161,9 +197,140 @@
                     "location": {"value": "[variables('constants').location]"}
                 }
             }
+        },
+        {
+            "comments": "Spoke 2 VNet",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "name": "[variables('deploymentNames').VNetSpoke2]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('constants').templateLocationURI, 'IaCDemo2-VNet-Spoke.json')]"
+                },
+                "parameters": {
+                    "virtualNetwork_name": {"value": "[parameters('spoke2VNet_Name')]"},
+                    "virtualNetwork_addressSpace": {"value": "[parameters('spoke2VNet_AddressSpace')]"},
+                    "subnet_appGW_name": {"value": "[parameters('spoke2VNet_subnetAppGW_name')]"},
+                    "subnet_appGW_addressSpace": {"value": "[parameters('spoke2VNet_subnetAppGW_addressSpace')]"},
+                    "nsg_appGW_name": {"value": "[function.nsgName(parameters('spoke2VNet_subnetAppGW_name'))]"},
+                    "subnet_1_name": {"value": "[parameters('spoke2VNet_subnet1_name')]"},
+                    "subnet_1_addressSpace": {"value": "[parameters('spoke2VNet_subnet1_addressSpace')]"},
+                    "nsg_1_name": {"value": "[function.nsgName(parameters('spoke2VNet_subnet1_name'))]"},
+                    "subnet_2_name": {"value": "[parameters('spoke2VNet_subnet2_name')]"},
+                    "subnet_2_addressSpace": {"value": "[parameters('spoke2VNet_subnet2_addressSpace')]"},
+                    "nsg_2_name": {"value": "[function.nsgName(parameters('spoke2VNet_subnet2_name'))]"},
+                    "subnet_3_name": {"value": "[parameters('spoke2VNet_subnet3_name')]"},
+                    "subnet_3_addressSpace": {"value": "[parameters('spoke2VNet_subnet3_addressSpace')]"},
+                    "nsg_3_name": {"value": "[function.nsgName(parameters('spoke2VNet_subnet3_name'))]"},
+                    "configureRouteTable": {"value": "[variables('constants').configureRouteTable]"},
+                    "routeTableName": {"value": "[variables('constants').routeTableName]"},
+                    "ddosPlanId": {"value": "Skip"},
+                    "location": {"value": "[variables('constants').location]"}
+                }
+            }
+        },
+
+        // VNet Peerings
+        {
+            "comments": "Hub to Spoke 1",
+            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+            "apiVersion": "2020-11-01",
+            "name": "[concat(parameters('hubVNet_Name'), '/', parameters('hubVNet_Name'), '_to_', parameters('spoke1VNet_Name'))]",
+            "dependsOn": [
+                "[variables('deploymentNames').VNetHub]",
+                "[variables('deploymentNames').VNetSpoke1]"
+            ],
+            "properties": {
+                "remoteVirtualNetwork": {
+                    "id": "[reference(variables('deploymentNames').VNetSpoke1).outputs.vnetID.value]"
+                },
+                "allowVirtualNetworkAccess": true,
+                "allowForwardedTraffic": true,
+                "allowGatewayTransit": false,
+                "useRemoteGateways": false,
+                "remoteAddressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('spoke1VNet_AddressSpace')]"
+                    ]
+                }
+            }
+        },
+        {
+            "comments": "Spoke 1 to Hub",
+            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+            "apiVersion": "2020-11-01",
+            "name": "[concat(parameters('spoke1VNet_Name'), '/', parameters('spoke1VNet_Name'), '_to_', parameters('hubVNet_Name'))]",
+            "dependsOn": [
+                "[variables('deploymentNames').VNetHub]",
+                "[variables('deploymentNames').VNetSpoke1]"
+            ],
+            "properties": {
+                "remoteVirtualNetwork": {
+                    "id": "[reference(variables('deploymentNames').VNetHub).outputs.vnetID.value]"
+                },
+                "allowVirtualNetworkAccess": true,
+                "allowForwardedTraffic": true,
+                "allowGatewayTransit": false,
+                "useRemoteGateways": false,
+                "remoteAddressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('hubVNet_AddressSpace')]"
+                    ]
+                }
+            }
+        },
+        {
+            "comments": "Hub to Spoke 2",
+            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+            "apiVersion": "2020-11-01",
+            "name": "[concat(parameters('hubVNet_Name'), '/', parameters('hubVNet_Name'), '_to_', parameters('spoke2VNet_Name'))]",
+            "dependsOn": [
+                "[variables('deploymentNames').VNetHub]",
+                "[variables('deploymentNames').VNetSpoke2]"
+            ],
+            "properties": {
+                "remoteVirtualNetwork": {
+                    "id": "[reference(variables('deploymentNames').VNetSpoke2).outputs.vnetID.value]"
+                },
+                "allowVirtualNetworkAccess": true,
+                "allowForwardedTraffic": true,
+                "allowGatewayTransit": false,
+                "useRemoteGateways": false,
+                "remoteAddressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('spoke2VNet_AddressSpace')]"
+                    ]
+                }
+            }
+        },
+        {
+            "comments": "Spoke 2 to Hub",
+            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+            "apiVersion": "2020-11-01",
+            "name": "[concat(parameters('spoke2VNet_Name'), '/', parameters('spoke2VNet_Name'), '_to_', parameters('hubVNet_Name'))]",
+            "dependsOn": [
+                "[variables('deploymentNames').VNetHub]",
+                "[variables('deploymentNames').VNetSpoke2]"
+            ],
+            "properties": {
+                "remoteVirtualNetwork": {
+                    "id": "[reference(variables('deploymentNames').VNetHub).outputs.vnetID.value]"
+                },
+                "allowVirtualNetworkAccess": true,
+                "allowForwardedTraffic": true,
+                "allowGatewayTransit": false,
+                "useRemoteGateways": false,
+                "remoteAddressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('hubVNet_AddressSpace')]"
+                    ]
+                }
+            }
         }
 
         // Route Table
+
 
         // VMs
 

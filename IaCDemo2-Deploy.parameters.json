@@ -5,6 +5,7 @@
         "assetLocationURI": {
             "value": "https://raw.githubusercontent.com/mbakunas/IaC-Demo-2/main/"
         },
+
         "hubVNet_Name": {
             "value": "Hub-EastUS2-01"
         },
@@ -32,6 +33,7 @@
         "hubVNet_subnet1_addressSpace": {
             "value": "10.0.1.0/27"
         },
+
         "spoke1VNet_Name": {
             "value": "Spoke-Prod-EastUS2-01"
         },
@@ -57,10 +59,41 @@
             "value": "10.1.4.0/23"
         },
         "spoke1VNet_subnet3_name": {
-            "value": "DataTier_10.1.6.0_23"
+            "value": "DataTier-10.1.6.0_23"
         },
         "spoke1VNet_subnet3_addressSpace": {
             "value": "10.1.6.0/23"
+        },
+        
+        "spoke2VNet_Name": {
+            "value": "Spoke-NonProd-EastUS2-01"
+        },
+        "spoke2VNet_AddressSpace": {
+            "value": "10.2.0.0/16"
+        },
+        "spoke2VNet_subnetAppGW_name": {
+            "value": "AppGW-10.2.0.0_24"
+        },
+        "spoke2VNet_subnetAppGW_addressSpace": {
+            "value": "10.2.0.0/24"
+        },
+        "spoke2VNet_subnet1_name": {
+            "value": "WebTier-10.2.2.0_23"
+        },
+        "spoke2VNet_subnet1_addressSpace": {
+            "value": "10.2.2.0/23"
+        },
+        "spoke2VNet_subnet2_name": {
+            "value": "AppTier-10.2.4.0_23"
+        },
+        "spoke2VNet_subnet2_addressSpace": {
+            "value": "10.2.4.0/23"
+        },
+        "spoke2VNet_subnet3_name": {
+            "value": "DataTier-10.2.6.0_23"
+        },
+        "spoke2VNet_subnet3_addressSpace": {
+            "value": "10.2.6.0/23"
         }
     }
 }
