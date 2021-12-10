@@ -138,7 +138,7 @@
                     {
                         "name": "[parameters('subnet_3_name')]",
                         "properties": {
-                            "addressPrefix": "[parameters('subnet_2_addressSpace')]",
+                            "addressPrefix": "[parameters('subnet_3_addressSpace')]",
                             "serviceEndpoints": [],
                             "delegations": [],
                             "privateEndpointNetworkPolicies": "Enabled",
