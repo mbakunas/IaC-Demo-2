@@ -94,6 +94,13 @@
         },
         "spoke2VNet_subnet3_addressSpace": {
             "value": "10.2.6.0/23"
+        },
+
+        "routeTable_configure": {
+            "value": true
+        },
+        "routeTable_name": {
+            "value": "RouteTable-EastUS2-01"
         }
     }
 }
