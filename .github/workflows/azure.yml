@@ -27,6 +27,6 @@ jobs:
         # Provide the target region, only required for management Group or Subscription deployments.
         region: eastus2
         # Specify the path or URL to the Azure Resource Manager template.
-        template: ./IaCDemo2-Deploy.json
+        template: ./iacdemo2-deploy.json
         # Supply deployment parameter values.
-        parameters: ./IaCDemo2-Deploy.parameters.json
+        parameters: ./iacdemo2-deploy.parameters.json
