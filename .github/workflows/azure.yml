@@ -25,3 +25,4 @@ jobs:
         region: eastus2
         template: ./IaCDemo2-Deploy.json
         parameters: ./IaCDemo2-Deploy.parameters.json
+          networkResourceGoup_Name=IaC-Demo2-01-GitHub computeResourceGroup_Name=IaC-Demo2-02-GitHub
