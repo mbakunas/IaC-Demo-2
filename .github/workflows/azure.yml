@@ -6,7 +6,7 @@ name: Deploy Infrastructure with ARM Demo
 jobs:
   deploy-arm-template:
     runs-on: ubuntu-latest
-    environment: Dev
+    environment: sandbox3
     
     steps:
     - name: Check out the repo
