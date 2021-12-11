@@ -17,5 +17,16 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDS }}
     
-    - run: |
-        az deployment sub create --subscription ${{secrets.AZURE_CREDS}} --name github-deploy --location eastus2 --template-file ./iacdemo2-deploy.json --parameters ./iacdemo2-deploy.parameters.json
+    - name: Deploy IaCDemo2-Deploy.json ARM Template
+      uses: Azure/arm-deploy@v1
+      with:
+        # Provide the scope of the deployment. Valid values are: 'resourcegroup', 'managementgroup', 'subscription'
+        scope: subscription
+        # Override the Subscription Id set by Azure Login.
+        subscriptionId: ${{ secrets.AZURE_CREDS }}
+        # Provide the target region, only required for management Group or Subscription deployments.
+        region: eastus2
+        # Specify the path or URL to the Azure Resource Manager template.
+        template: ./IaCDemo2-Deploy.json
+        # Supply deployment parameter values.
+        parameters: ./IaCDemo2-Deploy.parameters.json
