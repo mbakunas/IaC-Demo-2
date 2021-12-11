@@ -6,6 +6,13 @@
             "value": "https://raw.githubusercontent.com/mbakunas/IaC-Demo-2/main/"
         },
 
+        "networkResourceGoup_Name": {
+            "value": "IaC-Demo2-01"
+        },
+        "computeResourceGroup_Name": {
+            "value": "IaC-Demo2-02"
+        },
+
         "hubVNet_Name": {
             "value": "Hub-EastUS2-01"
         },
