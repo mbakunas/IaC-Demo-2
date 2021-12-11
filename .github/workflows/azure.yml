@@ -20,13 +20,8 @@ jobs:
     - name: Deploy IaCDemo2-Deploy.json ARM Template
       uses: Azure/arm-deploy@v1
       with:
-        # Provide the scope of the deployment. Valid values are: 'resourcegroup', 'managementgroup', 'subscription'
         scope: subscription
-        # Override the Subscription Id set by Azure Login.
         subscriptionId: ${{ secrets.SUB_ID }}
-        # Provide the target region, only required for management Group or Subscription deployments.
         region: eastus2
-        # Specify the path or URL to the Azure Resource Manager template.
         template: ./IaCDemo2-Deploy.json
-        # Supply deployment parameter values.
         parameters: ./IaCDemo2-Deploy.parameters.json
