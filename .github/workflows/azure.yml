@@ -30,3 +30,4 @@ jobs:
         template: ./IaCDemo2-Deploy.json
         # Supply deployment parameter values.
         parameters: ./IaCDemo2-Deploy.parameters.json
+          computeResourceGroup_Name=IaC-Demo2-Foo
