@@ -1,0 +1,31 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vnet_Name": {
+            "value": "Hub-EastUS2-01"
+        },
+        "vnet_AddressSpace": {
+            "value": "10.0.0.0/23"
+        },
+        "vnet_Location": {
+            "value": "eastus2"
+        },
+        "vnet_RouteTableId": {
+            "value": "/subscriptions/fac1ea11-e5a7-4e74-8d7e-965344c54f56/resourceGroups/IaC-Demo-2-01/providers/Microsoft.Network/routeTables/RouteTable-01"
+        },
+        "subnets": {
+            "value": [
+                {
+                    "name": "AzureBastionSubnet",
+                    "addressSpace": "10.0.0.128/26"
+                },
+                {
+                    "name": "CorpNet",
+                    "addressSpace": "10.0.1.0/24",
+                    "nsgName": "CorpNet-10.0.1.0_24"
+                }
+            ]
+        }
+    }
+}

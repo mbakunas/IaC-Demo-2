@@ -1,0 +1,69 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.6.18.56646",
+      "templateHash": "6022323560028813871"
+    }
+  },
+  "parameters": {
+    "vnet_Name": {
+      "type": "string"
+    },
+    "vnet_AddressSpace": {
+      "type": "string"
+    },
+    "vnet_Location": {
+      "type": "string"
+    },
+    "vnet_RouteTableId": {
+      "type": "string"
+    },
+    "subnets": {
+      "type": "array"
+    }
+  },
+  "variables": {
+    "specialSubnets": [
+      "GatewaySubnet",
+      "AzureFirewallSubnet",
+      "AzureBastionSubnet",
+      "RouteServerSubnet"
+    ]
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2020-11-01",
+      "name": "[parameters('vnet_Name')]",
+      "location": "[parameters('vnet_Location')]",
+      "properties": {
+        "copy": [
+          {
+            "name": "subnets",
+            "count": "[length(parameters('subnets'))]",
+            "input": {
+              "name": "[parameters('subnets')[copyIndex('subnets')].name]",
+              "properties": {
+                "addressPrefix": "[parameters('subnets')[copyIndex('subnets')].addressSpace]",
+                "networkSecurityGroup": {
+                  "id": "[if(contains(variables('specialSubnets'), parameters('subnets')[copyIndex('subnets')].name), null(), parameters('subnets')[copyIndex('subnets')].nsgName)]"
+                },
+                "routeTable": {
+                  "id": "[if(contains(variables('specialSubnets'), parameters('subnets')[copyIndex('subnets')].name), null(), parameters('vnet_RouteTableId'))]"
+                }
+              }
+            }
+          }
+        ],
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('vnet_AddressSpace')]"
+          ]
+        }
+      }
+    }
+  ]
+}
