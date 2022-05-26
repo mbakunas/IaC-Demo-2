@@ -29,6 +29,7 @@ var specialSubnets = [
   'RouteServerSubnet'
 ]
 
+//var nsgId = [for i in range(0, length(subnets)-1): ]
 
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2020-11-01' = {
   name: vnet_Name
@@ -55,7 +56,7 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2020-11-01' = {
   }
 }
 
-resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2020-11-01' = [ for i in range(0, length(subnets)): if (subnets[i].nsgName != 'none') {
+resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2020-11-01' = [ for i in range(0, length(subnets)-1): if (subnets[i].nsgName != 'none') {
   //name: (contains(specialSubnets, subnets[i].name) ? 'foo' : subnets[i].nsgName)
   name: subnets[i].nsgName
   location: vnet_Location
