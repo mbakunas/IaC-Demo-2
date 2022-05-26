@@ -1,4 +1,4 @@
-name: Deploy VNet ARM Template
+name: VNet
 env:
   region: eastus2
   resourceGroup: IaC-Demo-2-01
