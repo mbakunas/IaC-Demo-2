@@ -18,7 +18,8 @@
             "value": [
                 {
                     "name": "AzureBastionSubnet",
-                    "addressSpace": "10.0.0.128/26"
+                    "addressSpace": "10.0.0.128/26",
+                    "nsgName": "none"
                 },
                 {
                     "name": "CorpNet",
