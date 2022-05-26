@@ -45,7 +45,7 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2020-11-01' = {
       properties: {
         addressPrefix: subnet.addressSpace
         networkSecurityGroup: {
-          id: (contains(specialSubnets, subnet.name) ? null : subnet.nsgName)
+          id: (contains(specialSubnets, subnet.name) ? null : networkSecurityGroup[subnet].id)
         }
         routeTable: {
           id: (contains(specialSubnets, subnet.name) ? null : vnet_RouteTableId)
@@ -54,3 +54,12 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2020-11-01' = {
     }]
   }
 }
+
+resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2020-11-01' = [ for s in subnets: if (!contains(specialSubnets, subnets[s].name)) {
+  name: subnets[s].nsgName
+  location: vnet_Location
+  tags: resourceGroup().tags
+  properties: {
+    securityRules: []
+  }
+}]
