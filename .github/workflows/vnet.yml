@@ -31,3 +31,4 @@ jobs:
         region: ${{env.region}}
         template: ${{env.templateFile}}
         parameters: ${{env.templateParametersFile}}
+        deploymentName: 'Github.Actions-${{ github.workflow }}-${{ github.run_number }}'
