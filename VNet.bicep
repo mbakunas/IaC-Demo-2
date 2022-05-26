@@ -55,7 +55,7 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2020-11-01' = {
   }
 }
 
-resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2020-11-01' = [ for i in range(0, length(subnets)): if (subnets[i].name != 'none') {
+resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2020-11-01' = [ for i in range(0, length(subnets)): if (subnets[i].nsgName != 'none') {
   //name: (contains(specialSubnets, subnets[i].name) ? 'foo' : subnets[i].nsgName)
   name: subnets[i].nsgName
   location: vnet_Location

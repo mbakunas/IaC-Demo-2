@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.6.18.56646",
-      "templateHash": "5069659652094635299"
+      "templateHash": "8826741834871630128"
     }
   },
   "parameters": {
@@ -70,7 +70,7 @@
       ]
     },
     {
-      "condition": "[not(equals(parameters('subnets')[range(0, length(parameters('subnets')))[copyIndex()]].name, 'none'))]",
+      "condition": "[not(equals(parameters('subnets')[range(0, length(parameters('subnets')))[copyIndex()]].nsgName, 'none'))]",
       "copy": {
         "name": "networkSecurityGroup",
         "count": "[length(range(0, length(parameters('subnets'))))]"
