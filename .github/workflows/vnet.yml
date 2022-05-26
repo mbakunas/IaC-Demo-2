@@ -3,7 +3,7 @@ env:
   region: eastus2
   resourceGroup: IaC-Demo-2-01
   templateFile: ./VNet.bicep
-  templateParametersFile: ./vnet.parameters.jsonc
+  templateParametersFile: ./VNet.parameters.jsonc
 
 on:
   workflow_dispatch:
