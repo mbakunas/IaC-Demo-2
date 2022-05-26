@@ -30,4 +30,4 @@ jobs:
         resourceGroupName: ${{env.resourceGroup}}
         region: ${{env.region}}
         template: ${{env.templateFile}}
-        parameters: ${{templateParametersFile}}
+        parameters: ${{env.templateParametersFile}}
