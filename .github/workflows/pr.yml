@@ -40,7 +40,7 @@ jobs:
       with:
         azcliversion: 2.30.0
         inlineScript: |
-          az deployment group what-if --subscription ${{secrets.SUB_SANDBOX_3}} --resource-group ${{env.resourceGroup}} --template-file ${{env.templateFile}}
+          az deployment group what-if --subscription ${{secrets.SUB_SANDBOX_3}} --resource-group ${{env.resourceGroup}} --template-file ${{env.templateFile}} @${{templateParametersFile}}
     
     - name: Comment the PR
       uses: thollander/actions-comment-pull-request@v1
