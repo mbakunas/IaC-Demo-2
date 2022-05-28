@@ -20,7 +20,6 @@ Format the array like this:
 ]
 */
 
-//var nsgId = [for i in range(0, length(subnets)-1): ]
 
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2020-11-01' = {
   name: vnet_Name
