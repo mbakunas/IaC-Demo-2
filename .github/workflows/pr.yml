@@ -21,18 +21,6 @@ jobs:
       uses: azure/login@v1
       with:
         creds: ${{secrets.AZURE_CREDS}}
-      
-    # - name: Preview Changes
-    #   uses: Azure/arm-deploy@v1
-    #   id: preview
-    #   with:
-    #     scope: resourcegroup
-    #     subscriptionId: ${{ secrets.SUB_SANDBOX_3 }}
-    #     resourceGroupName: ${{env.resourceGroup}}
-    #     region: ${{env.region}}
-    #     template: ${{env.templateFile}}
-    #     parameters: ${{env.templateParametersFile}}
-    #     additionalArguments: "--what-if"
 
     - name: Preview Changes
       id: preview
