@@ -35,14 +35,14 @@ jobs:
     #     additionalArguments: "--what-if"
 
     - name: Preview Changes
-      uses: azure/CLI@v1
+      id: preview
+      uses: actions/github-script@v6
       with:
-        inlineScript: |
-          $previewResult = az deployment group what-if --subscription ${{secrets.SUB_SANDBOX_3}} --resource-group ${{env.resourceGroup}} --template-file ${{env.templateFile}}
-          echo "::set-output name={previewResult}::{${previewResult}}"
+        script: az deployment group what-if --subscription ${{secrets.SUB_SANDBOX_3}} --resource-group ${{env.resourceGroup}} --template-file ${{env.templateFile}}
+        result-encoding: string
     
     - name: Comment the PR
       uses: thollander/actions-comment-pull-request@v1
       with:
-        message: ${{steps.preview.outputs.*}}
+        message: ${{steps.preview.outputs.result}}
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
