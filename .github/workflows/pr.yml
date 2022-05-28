@@ -22,17 +22,24 @@ jobs:
       with:
         creds: ${{secrets.AZURE_CREDS}}
       
+    # - name: Preview Changes
+    #   uses: Azure/arm-deploy@v1
+    #   id: preview
+    #   with:
+    #     scope: resourcegroup
+    #     subscriptionId: ${{ secrets.SUB_SANDBOX_3 }}
+    #     resourceGroupName: ${{env.resourceGroup}}
+    #     region: ${{env.region}}
+    #     template: ${{env.templateFile}}
+    #     parameters: ${{env.templateParametersFile}}
+    #     additionalArguments: "--what-if"
+
     - name: Preview Changes
-      uses: Azure/arm-deploy@v1
-      id: preview
+      uses: azure/CLI@v1
       with:
-        scope: resourcegroup
-        subscriptionId: ${{ secrets.SUB_SANDBOX_3 }}
-        resourceGroupName: ${{env.resourceGroup}}
-        region: ${{env.region}}
-        template: ${{env.templateFile}}
-        parameters: ${{env.templateParametersFile}}
-        additionalArguments: "--what-if"
+        inlineScript: |
+          $previewResult = az deployment group what-if --subscription ${{secrets.SUB_SANDBOX_3}} --resource-group ${{env.resourceGroup}} --template-file ${{env.templateFile}}
+          echo "::set-output name={previewResult}::{${previewResult}}"
     
     - name: Comment the PR
       uses: thollander/actions-comment-pull-request@v1
