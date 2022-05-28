@@ -36,10 +36,7 @@ jobs:
 
     - name: Preview Changes
       id: preview
-      uses: azure/CLI@v1
-      with:
-        azcliversion: 2.30.0
-        inlineScript: |
+      run: |
           az deployment group what-if --subscription ${{secrets.SUB_SANDBOX_3}} --resource-group ${{env.resourceGroup}} --template-file ${{env.templateFile}} --parameters '@${{env.templateParametersFile}}'
           echo "::set-output name=response::$output"
     
