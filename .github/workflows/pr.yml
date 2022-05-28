@@ -40,7 +40,6 @@ jobs:
       with:
         inlineScript: |
           az deployment group what-if --subscription ${{secrets.SUB_SANDBOX_3}} --resource-group ${{env.resourceGroup}} --template-file ${{env.templateFile}}
-          echo "::set-output name=response::$output"
     
     - name: Comment the PR
       uses: thollander/actions-comment-pull-request@v1
