@@ -30,4 +30,4 @@ jobs:
     
     - name: Check output
       run: |
-          echo "${{steps.preview.outputs.response}}"
+          echo "${{steps.preview.outputs.*}}"
