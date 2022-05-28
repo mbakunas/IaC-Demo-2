@@ -1,9 +1,9 @@
-name: Deploy VNet ARM Template
+name: VNet
 env:
   region: eastus2
   resourceGroup: IaC-Demo-2-01
   templateFile: ./VNet.bicep
-  templateParametersFile: ./vnet.parameters.jsonc
+  templateParametersFile: ./VNet.parameters.jsonc
 
 on:
   workflow_dispatch:
@@ -11,7 +11,6 @@ on:
 jobs:
   deploy-arm-template:
     runs-on: ubuntu-latest
-    environment: sandbox3
     
     steps:
     - name: Check out the repo
@@ -22,12 +21,13 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDS }}
     
-    - name: Deploy IaCDemo2-Deploy.json ARM Template
+    - name: Deploy ARM Template
       uses: Azure/arm-deploy@v1
       with:
-        scope: resourceGroup
+        scope: resourcegroup
         subscriptionId: ${{ secrets.SUB_SANDBOX_3 }}
         resourceGroupName: ${{env.resourceGroup}}
         region: ${{env.region}}
         template: ${{env.templateFile}}
         parameters: ${{env.templateParametersFile}}
+        deploymentName: 'Github.Actions-${{ github.workflow }}-${{ github.run_number }}'
