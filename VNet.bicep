@@ -20,6 +20,8 @@ Format the array like this:
 ]
 */
 
+//foo
+
 
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2020-11-01' = {
   name: vnet_Name
