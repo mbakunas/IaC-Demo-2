@@ -24,14 +24,7 @@ jobs:
 
     - name: Preview Changes
       id: preview
-      run: |
-          OUTPUT="$(az deployment group what-if \
-            --subscription ${{secrets.SUB_SANDBOX_3}} \
-            --resource-group ${{env.resourceGroup}} \
-            --template-file ${{env.templateFile}} \
-            --parameters '@${{env.templateParametersFile}}')"
-          echo "::set-output name=response::$OUTPUT"
-          echo $OUTPUT
+      run: echo "::set-output name=response::$(az deployment group what-if --subscription ${{secrets.SUB_SANDBOX_3}} --resource-group ${{env.resourceGroup}} --template-file ${{env.templateFile}} --parameters '@${{env.templateParametersFile}}')"
     
     - name: Check output
       run: |
