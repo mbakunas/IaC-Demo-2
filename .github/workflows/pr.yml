@@ -7,8 +7,8 @@ env:
 
 on:
   pull_request:
-    branches:
-    - main
+    types: [opened]
+    branches: [main]
 
 jobs:
   preview:
@@ -39,6 +39,10 @@ jobs:
       run: |
           OUTPUT=$(az deployment group what-if --subscription ${{secrets.SUB_SANDBOX_3}} --resource-group ${{env.resourceGroup}} --template-file ${{env.templateFile}} --parameters '@${{env.templateParametersFile}}')
           echo "::set-output name=response::$OUTPUT"
+    
+    - name: Check output
+      run: |
+          echo "${{steps.preview.outputs.response}}"
     
     - name: Comment the PR
       uses: thollander/actions-comment-pull-request@v1
