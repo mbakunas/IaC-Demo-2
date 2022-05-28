@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.6.18.56646",
-      "templateHash": "8826741834871630128"
+      "templateHash": "3911926987911046285"
     }
   },
   "parameters": {
@@ -18,20 +18,9 @@
     "vnet_Location": {
       "type": "string"
     },
-    "vnet_RouteTableId": {
-      "type": "string"
-    },
     "subnets": {
       "type": "array"
     }
-  },
-  "variables": {
-    "specialSubnets": [
-      "GatewaySubnet",
-      "AzureFirewallSubnet",
-      "AzureBastionSubnet",
-      "RouteServerSubnet"
-    ]
   },
   "resources": [
     {
@@ -48,13 +37,7 @@
             "input": {
               "name": "[parameters('subnets')[copyIndex('subnets')].name]",
               "properties": {
-                "addressPrefix": "[parameters('subnets')[copyIndex('subnets')].addressSpace]",
-                "networkSecurityGroup": {
-                  "id": "[if(contains(variables('specialSubnets'), parameters('subnets')[copyIndex('subnets')].name), null(), resourceId('Microsoft.Network/networkSecurityGroups', parameters('subnets')[range(0, length(parameters('subnets')))[copyIndex('subnets')]].nsgName))]"
-                },
-                "routeTable": {
-                  "id": "[if(contains(variables('specialSubnets'), parameters('subnets')[copyIndex('subnets')].name), null(), parameters('vnet_RouteTableId'))]"
-                }
+                "addressPrefix": "[parameters('subnets')[copyIndex('subnets')].addressSpace]"
               }
             }
           }
@@ -64,24 +47,6 @@
             "[parameters('vnet_AddressSpace')]"
           ]
         }
-      },
-      "dependsOn": [
-        "networkSecurityGroup"
-      ]
-    },
-    {
-      "condition": "[not(equals(parameters('subnets')[range(0, length(parameters('subnets')))[copyIndex()]].nsgName, 'none'))]",
-      "copy": {
-        "name": "networkSecurityGroup",
-        "count": "[length(range(0, length(parameters('subnets'))))]"
-      },
-      "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2020-11-01",
-      "name": "[parameters('subnets')[range(0, length(parameters('subnets')))[copyIndex()]].nsgName]",
-      "location": "[parameters('vnet_Location')]",
-      "tags": "[resourceGroup().tags]",
-      "properties": {
-        "securityRules": []
       }
     }
   ]
