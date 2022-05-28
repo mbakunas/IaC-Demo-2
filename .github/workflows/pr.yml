@@ -24,7 +24,17 @@ jobs:
 
     - name: Preview Changes
       id: preview
-      run: echo "::set-output name=response::$(az deployment group what-if --subscription ${{secrets.SUB_SANDBOX_3}} --resource-group ${{env.resourceGroup}} --template-file ${{env.templateFile}} --parameters '@${{env.templateParametersFile}}')"
+      run: |
+        output="$(az deployment group what-if \
+          --subscription ${{secrets.SUB_SANDBOX_3}} \
+          --resource-group ${{env.resourceGroup}} \
+          --template-file ${{env.templateFile}} \
+          --parameters '@${{env.templateParametersFile}}')"
+          output="${output//'%'/'%25'}"
+          output="${output//$'\n'/'%0A'}"
+          output="${output//$'\r'/'%0D'}"
+          echo "::set-output name=response::$output"
+
     
     - name: Check output
       run: |
