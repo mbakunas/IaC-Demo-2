@@ -37,16 +37,9 @@ jobs:
     - name: Preview Changes
       id: preview
       run: |
-          OUTPUT=$(az deployment group what-if --subscription ${{secrets.SUB_SANDBOX_3}} --resource-group ${{env.resourceGroup}} --template-file ${{env.templateFile}} --parameters '@${{env.templateParametersFile}}');
+          OUTPUT=$(az deployment group what-if --subscription ${{secrets.SUB_SANDBOX_3}} --resource-group ${{env.resourceGroup}} --template-file ${{env.templateFile}} --parameters '@${{env.templateParametersFile}}')
           echo "::set-output name=response::$OUTPUT"
     
     - name: Check output
       run: |
           echo "${{steps.preview.outputs.response}}"
-    
-    - name: Comment the PR
-      uses: thollander/actions-comment-pull-request@v1
-      with:
-        message: |
-          ${{steps.preview.outputs.response}}
-        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
