@@ -38,5 +38,8 @@ jobs:
     - name: Comment the PR
       uses: thollander/actions-comment-pull-request@v1
       with:
-        message: "`${{steps.preview.outputs.response}}`"
+        message: |
+          "```"
+          "${{steps.preview.outputs.response}}"
+          "```"
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
