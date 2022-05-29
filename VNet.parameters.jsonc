@@ -14,6 +14,10 @@
         "subnets": {
             "value": [
                 {
+                    "name": "GatewaySubnet",
+                    "addressSpace": "10.0.0.0/26"
+                },
+                {
                     "name": "AzureBastionSubnet",
                     "addressSpace": "10.0.0.128/26"
                 },
