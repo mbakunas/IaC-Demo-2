@@ -1,4 +1,4 @@
-name: Deploy ARM Template
+name: Deploy-ARM-Template
 env:
   region: eastus2
   resourceGroup: IaC-Demo-2-01
