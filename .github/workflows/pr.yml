@@ -40,6 +40,6 @@ jobs:
       with:
         message: |
           ```
-          "${{steps.preview.outputs.response}}"
+          ${{steps.preview.outputs.response}}
           ```
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
