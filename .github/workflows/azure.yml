@@ -12,8 +12,6 @@ on:
       - "**.bicep"
       - "**.parameters.jsonc"
 
-  workflow_dispatch:
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
