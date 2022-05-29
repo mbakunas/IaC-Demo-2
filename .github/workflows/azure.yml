@@ -8,6 +8,9 @@ env:
 on:
   push:
     branches: [main]
+    paths:
+      - "**.bicep"
+      - "**.parameters.jsonc"
 
   workflow_dispatch:
 
