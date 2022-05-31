@@ -13,15 +13,16 @@ param hubVnet_SubnetList array
 
 
 
-var hubVNet_Subnets = [for subnet in hubVnet_SubnetList: {
-  name: subnet.name
-  addressSpace: subnet.addressSpace
-}]
 
 
 //
 // deploy VNets with subnets
 //
+
+var hubVNet_Subnets = [for subnet in hubVnet_SubnetList: {
+  name: subnet.name
+  addressSpace: subnet.addressSpace
+}]
 
 // hub VNet
 resource hubResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
