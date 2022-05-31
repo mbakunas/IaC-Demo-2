@@ -47,7 +47,7 @@ module hubVNet 'Modules/VNet.bicep' = {
 
 module hubNsg 'Modules/NSG.bicep' = [for (subnet, i) in hubVnet_SubnetList: if(contains(subnet, 'nsgName')) {
   scope: hubResourceGroup
-  name: '${deployment().name}-NSG${i+1}'
+  name: '${deployment().name}-NSG${i}'
   params: {
     nsg_Location: primaryRegion
     nsg_Name: subnet.nsgName
@@ -56,7 +56,7 @@ module hubNsg 'Modules/NSG.bicep' = [for (subnet, i) in hubVnet_SubnetList: if(c
 
 module subnet 'Modules/Subnet.bicep' = [for (subnet, i) in hubVnet_SubnetList: if(contains(subnet, 'nsgName')) {
   scope: hubResourceGroup
-  name: '${deployment().name}-UpdateSubnet${i+1}'
+  name: '${deployment().name}-UpdateSubnet${i}'
   params: {
     subnet_Name: subnet.name
     subnet_AddressSpace: subnet.addressSpace
