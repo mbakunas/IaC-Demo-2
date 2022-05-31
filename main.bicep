@@ -59,6 +59,7 @@ module subnet 'Modules/Subnet.bicep' = [for (subnet, i) in hubVnet_SubnetList: i
   name: '${deployment().name}-UpdateSubnet${i+1}'
   params: {
     subnet_Name: subnet.name
+    subnet_AddressSpace: subnet.addressSpace
     subnet_NsgId: hubNsg[i].outputs.nsgId
   }
 }]
