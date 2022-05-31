@@ -29,9 +29,8 @@ jobs:
     - name: Deploy to Azure
       uses: Azure/arm-deploy@v1
       with:
-        scope: resourcegroup
+        scope: subscription
         subscriptionId: ${{env.subscriptionId}}
-        resourceGroupName: ${{env.resourceGroup}}
         region: ${{env.region}}
         template: ${{env.templateFile}}
         parameters: ${{env.templateParametersFile}}
