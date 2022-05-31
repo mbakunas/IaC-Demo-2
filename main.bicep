@@ -45,7 +45,23 @@ module hubVNet 'Modules/VNet.bicep' = {
 
 // redeploy subnets with NSGs
 
+module hubNsg 'Modules/NSG.bicep' = [for (subnet, i) in hubVnet_SubnetList: if(contains(subnet, 'nsgName')) {
+  scope: hubResourceGroup
+  name: '${deployment().name}-NSG${i+1}'
+  params: {
+    nsg_Location: primaryRegion
+    nsg_Name: subnet.nsgName
+  }
+}]
 
+module subnet 'Modules/Subnet.bicep' = [for (subnet, i) in hubVnet_SubnetList: if(contains(subnet, 'nsgName')) {
+  scope: hubResourceGroup
+  name: '${deployment().name}-UpdateSubnet${i+1}'
+  params: {
+    subnet_Name: subnet.name
+    subnet_NsgId: hubNsg[i].outputs.nsgId
+  }
+}]
 
 // redeploy subnets with route tables
 
