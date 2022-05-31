@@ -1,0 +1,139 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.6.18.56646",
+      "templateHash": "7631839901010756582"
+    }
+  },
+  "parameters": {
+    "primaryRegion": {
+      "type": "string",
+      "defaultValue": "eastus2"
+    },
+    "resourceGroupRegion": {
+      "type": "string",
+      "defaultValue": "[deployment().location]"
+    },
+    "hubVnet_ResourceGroupName": {
+      "type": "string"
+    },
+    "hubVnet_ResourceGroupTags": {
+      "type": "object"
+    },
+    "hubVnet_Name": {
+      "type": "string"
+    },
+    "hubVnet_AddressSpace": {
+      "type": "string"
+    },
+    "hubVnet_SubnetList": {
+      "type": "array"
+    }
+  },
+  "variables": {
+    "copy": [
+      {
+        "name": "hubVNet_Subnets",
+        "count": "[length(parameters('hubVnet_SubnetList'))]",
+        "input": {
+          "name": "[parameters('hubVnet_SubnetList')[copyIndex('hubVNet_Subnets')].name]",
+          "addressSpace": "[parameters('hubVnet_SubnetList')[copyIndex('hubVNet_Subnets')].addressSpace]"
+        }
+      }
+    ]
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2021-04-01",
+      "name": "[parameters('hubVnet_ResourceGroupName')]",
+      "location": "[parameters('resourceGroupRegion')]",
+      "tags": "[parameters('hubVnet_ResourceGroupTags')]"
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "[format('{0}-hubVNet', deployment().name)]",
+      "resourceGroup": "[parameters('hubVnet_ResourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "subnets": {
+            "value": "[variables('hubVNet_Subnets')]"
+          },
+          "vnet_AddressSpace": {
+            "value": "[parameters('hubVnet_AddressSpace')]"
+          },
+          "vnet_Location": {
+            "value": "[parameters('primaryRegion')]"
+          },
+          "vnet_Name": {
+            "value": "[parameters('hubVnet_Name')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.6.18.56646",
+              "templateHash": "3911926987911046285"
+            }
+          },
+          "parameters": {
+            "vnet_Name": {
+              "type": "string"
+            },
+            "vnet_AddressSpace": {
+              "type": "string"
+            },
+            "vnet_Location": {
+              "type": "string"
+            },
+            "subnets": {
+              "type": "array"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/virtualNetworks",
+              "apiVersion": "2020-11-01",
+              "name": "[parameters('vnet_Name')]",
+              "location": "[parameters('vnet_Location')]",
+              "tags": "[resourceGroup().tags]",
+              "properties": {
+                "copy": [
+                  {
+                    "name": "subnets",
+                    "count": "[length(parameters('subnets'))]",
+                    "input": {
+                      "name": "[parameters('subnets')[copyIndex('subnets')].name]",
+                      "properties": {
+                        "addressPrefix": "[parameters('subnets')[copyIndex('subnets')].addressSpace]"
+                      }
+                    }
+                  }
+                ],
+                "addressSpace": {
+                  "addressPrefixes": [
+                    "[parameters('vnet_AddressSpace')]"
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('hubVnet_ResourceGroupName'))]"
+      ]
+    }
+  ]
+}

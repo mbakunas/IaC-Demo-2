@@ -1,0 +1,42 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "primaryRegion": {
+            "value": "eastus2"
+        },
+        "resourceGroupRegion": {
+            "value": "eastus2"
+        },
+        "hubVnet_ResourceGroupName": {
+            "value": "IAC-DEMO-2-01"
+        },
+        "hubVnet_ResourceGroupTags": {
+            "value": {
+               "Environment": "Sandbox"
+            }
+        },
+        "hubVnet_Name": {
+            "value": "VNet-HUB-EastUS2-01"
+        },
+        "hubVnet_AddressSpace": {
+            "value": "10.0.0.0/22"
+        },
+        "hubVnet_SubnetList": {
+            "value": [
+                {
+                    "name": "GatewaySubnet",
+                    "addressSpace": "10.0.0.0/26"
+                },
+                {
+                    "name": "AzureBastionSubnet",
+                    "addressSpace": "10.0.0.128/26"
+                },
+                {
+                    "name": "Infra-10.0.1.0_24",
+                    "addressSpace": "10.0.1.0/24"
+                }
+            ]
+        }
+    }
+}
