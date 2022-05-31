@@ -1,9 +1,10 @@
 name: Deploy-ARM-Template
 env:
   region: eastus2
+  subscriptionId: ${{secrets.SUB_SANDBOX_3}}
   resourceGroup: IaC-Demo-2-01
-  templateFile: ./VNet.bicep
-  templateParametersFile: ./VNet.parameters.jsonc
+  templateFile: ./main.bicep
+  templateParametersFile: ./main.parameters.jsonc
 
 on:
   push:
@@ -29,7 +30,7 @@ jobs:
       uses: Azure/arm-deploy@v1
       with:
         scope: resourcegroup
-        subscriptionId: ${{secrets.SUB_SANDBOX_3}}
+        subscriptionId: ${{env.subscriptionId}}
         resourceGroupName: ${{env.resourceGroup}}
         region: ${{env.region}}
         template: ${{env.templateFile}}
