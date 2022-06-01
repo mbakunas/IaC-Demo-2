@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.6.18.56646",
-      "templateHash": "3179775710219979287"
+      "templateHash": "7639969057772245822"
     }
   },
   "parameters": {
@@ -23,17 +23,25 @@
   },
   "resources": [
     {
+      "copy": {
+        "name": "resourceGroup",
+        "count": "[length(parameters('vnets'))]"
+      },
       "type": "Microsoft.Resources/resourceGroups",
       "apiVersion": "2021-04-01",
-      "name": "[parameters('vnets')[0].resourceGroupName]",
+      "name": "[parameters('vnets')[copyIndex()].resourceGroupName]",
       "location": "[parameters('resourceGroupRegion')]",
-      "tags": "[parameters('vnets')[0].resourceGroupTags]"
+      "tags": "[parameters('vnets')[copyIndex()].resourceGroupTags]"
     },
     {
+      "copy": {
+        "name": "hubVNet",
+        "count": "[length(parameters('vnets'))]"
+      },
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-10-01",
-      "name": "[format('{0}-hubVNet', deployment().name)]",
-      "resourceGroup": "[parameters('vnets')[0].resourceGroupName]",
+      "name": "[format('{0}-{1}', deployment().name, parameters('vnets')[copyIndex()].name)]",
+      "resourceGroup": "[parameters('vnets')[copyIndex()].resourceGroupName]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -41,16 +49,16 @@
         "mode": "Incremental",
         "parameters": {
           "subnets": {
-            "value": "[parameters('vnets')[0].subnets]"
+            "value": "[parameters('vnets')[copyIndex()].subnets]"
           },
           "vnet_AddressSpace": {
-            "value": "[parameters('vnets')[0].addressSpace]"
+            "value": "[parameters('vnets')[copyIndex()].addressSpace]"
           },
           "vnet_Location": {
             "value": "[parameters('primaryRegion')]"
           },
           "vnet_Name": {
-            "value": "[parameters('vnets')[0].name]"
+            "value": "[parameters('vnets')[copyIndex()].name]"
           }
         },
         "template": {
@@ -108,145 +116,7 @@
         }
       },
       "dependsOn": [
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vnets')[0].resourceGroupName)]"
-      ]
-    },
-    {
-      "copy": {
-        "name": "hubNsg",
-        "count": "[length(parameters('vnets')[0].subnets)]"
-      },
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2020-10-01",
-      "name": "[format('{0}-NSG{1}', deployment().name, copyIndex())]",
-      "resourceGroup": "[parameters('vnets')[0].resourceGroupName]",
-      "properties": {
-        "expressionEvaluationOptions": {
-          "scope": "inner"
-        },
-        "mode": "Incremental",
-        "parameters": {
-          "nsg_Location": {
-            "value": "[parameters('primaryRegion')]"
-          },
-          "nsg_Name": {
-            "value": "[if(contains(parameters('vnets')[0].subnets[copyIndex()], 'nsgName'), parameters('vnets')[0].subnets[copyIndex()].nsgName, 'none')]"
-          }
-        },
-        "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "contentVersion": "1.0.0.0",
-          "metadata": {
-            "_generator": {
-              "name": "bicep",
-              "version": "0.6.18.56646",
-              "templateHash": "13013213586852092157"
-            }
-          },
-          "parameters": {
-            "nsg_Name": {
-              "type": "string"
-            },
-            "nsg_Location": {
-              "type": "string"
-            }
-          },
-          "resources": [
-            {
-              "condition": "[not(equals(parameters('nsg_Name'), 'none'))]",
-              "type": "Microsoft.Network/networkSecurityGroups",
-              "apiVersion": "2019-11-01",
-              "name": "[parameters('nsg_Name')]",
-              "location": "[parameters('nsg_Location')]",
-              "tags": "[resourceGroup().tags]",
-              "properties": {
-                "securityRules": []
-              }
-            }
-          ],
-          "outputs": {
-            "nsgId": {
-              "type": "string",
-              "value": "[if(not(equals(parameters('nsg_Name'), 'none')), resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsg_Name')), 'none')]"
-            }
-          }
-        }
-      },
-      "dependsOn": [
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vnets')[0].resourceGroupName)]"
-      ]
-    },
-    {
-      "condition": "[contains(parameters('vnets')[0].subnets[copyIndex()], 'nsgName')]",
-      "copy": {
-        "name": "subnet",
-        "count": "[length(parameters('vnets')[0].subnets)]"
-      },
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2020-10-01",
-      "name": "[format('{0}-UpdateSubnet{1}', deployment().name, copyIndex())]",
-      "resourceGroup": "[parameters('vnets')[0].resourceGroupName]",
-      "properties": {
-        "expressionEvaluationOptions": {
-          "scope": "inner"
-        },
-        "mode": "Incremental",
-        "parameters": {
-          "subnet_Name": {
-            "value": "[parameters('vnets')[0].subnets[copyIndex()].name]"
-          },
-          "subnet_AddressSpace": {
-            "value": "[parameters('vnets')[0].subnets[copyIndex()].addressSpace]"
-          },
-          "subnet_NsgId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('vnets')[0].resourceGroupName), 'Microsoft.Resources/deployments', format('{0}-NSG{1}', deployment().name, copyIndex()))).outputs.nsgId.value]"
-          },
-          "subnet_VnetName": {
-            "value": "[parameters('vnets')[0].name]"
-          }
-        },
-        "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "contentVersion": "1.0.0.0",
-          "metadata": {
-            "_generator": {
-              "name": "bicep",
-              "version": "0.6.18.56646",
-              "templateHash": "1848953702215234828"
-            }
-          },
-          "parameters": {
-            "subnet_Name": {
-              "type": "string"
-            },
-            "subnet_AddressSpace": {
-              "type": "string"
-            },
-            "subnet_NsgId": {
-              "type": "string"
-            },
-            "subnet_VnetName": {
-              "type": "string"
-            }
-          },
-          "resources": [
-            {
-              "type": "Microsoft.Network/virtualNetworks/subnets",
-              "apiVersion": "2021-08-01",
-              "name": "[format('{0}/{1}', parameters('subnet_VnetName'), parameters('subnet_Name'))]",
-              "properties": {
-                "addressPrefix": "[parameters('subnet_AddressSpace')]",
-                "networkSecurityGroup": {
-                  "id": "[parameters('subnet_NsgId')]"
-                }
-              }
-            }
-          ]
-        }
-      },
-      "dependsOn": [
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('vnets')[0].resourceGroupName), 'Microsoft.Resources/deployments', format('{0}-NSG{1}', deployment().name, copyIndex()))]",
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vnets')[0].resourceGroupName)]"
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vnets')[copyIndex()].resourceGroupName)]"
       ]
     }
   ]

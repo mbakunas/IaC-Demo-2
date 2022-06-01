@@ -32,25 +32,25 @@ module hubVNet 'Modules/VNet.bicep' = [for (vnet, i) in vnets: {
 
 // redeploy subnets with NSGs
 
-module hubNsg 'Modules/NSG.bicep' = [for (subnet, i) in vnets[0].subnets: {
-  scope: resourceGroup[0]
-  name: '${deployment().name}-NSG${i}'
-  params: {
-    nsg_Location: primaryRegion
-    nsg_Name: contains(subnet, 'nsgName') ? subnet.nsgName : 'none' 
-  }
-}]
+// module hubNsg 'Modules/NSG.bicep' = [for (subnet, i) in vnets[0].subnets: {
+//   scope: resourceGroup[0]
+//   name: '${deployment().name}-NSG${i}'
+//   params: {
+//     nsg_Location: primaryRegion
+//     nsg_Name: contains(subnet, 'nsgName') ? subnet.nsgName : 'none' 
+//   }
+// }]
 
-module subnet 'Modules/Subnet.bicep' = [for (subnet, i) in vnets[0].subnets: if(contains(subnet, 'nsgName')) {
-  scope: resourceGroup[0]
-  name: '${deployment().name}-UpdateSubnet${i}'
-  params: {
-    subnet_Name: subnet.name
-    subnet_AddressSpace: subnet.addressSpace
-    subnet_NsgId: hubNsg[i].outputs.nsgId
-    subnet_VnetName: vnets[0].name
-  }
-}]
+// module subnet 'Modules/Subnet.bicep' = [for (subnet, i) in vnets[0].subnets: if(contains(subnet, 'nsgName')) {
+//   scope: resourceGroup[0]
+//   name: '${deployment().name}-UpdateSubnet${i}'
+//   params: {
+//     subnet_Name: subnet.name
+//     subnet_AddressSpace: subnet.addressSpace
+//     subnet_NsgId: hubNsg[i].outputs.nsgId
+//     subnet_VnetName: vnets[0].name
+//   }
+// }]
 
 // redeploy subnets with route tables
 
