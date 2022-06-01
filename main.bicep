@@ -18,7 +18,7 @@ resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = [for vn
 }]
 
 module hubVNet 'Modules/VNet.bicep' = [for (vnet, i) in vnets: {
-  name: '${deployment().name}-${vnet.name}'
+  name: '${deployment().name}-${i}'
   scope: resourceGroup[i]
   params: {
     subnets: vnet.subnets
