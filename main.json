@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.6.18.56646",
-      "templateHash": "4587884630132910210"
+      "templateHash": "3387839382070760116"
     }
   },
   "parameters": {
@@ -148,7 +148,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.6.18.56646",
-              "templateHash": "17805590533488641025"
+              "templateHash": "6897304382259956019"
             }
           },
           "parameters": {
@@ -168,7 +168,7 @@
               },
               "type": "Microsoft.Network/networkSecurityGroups",
               "apiVersion": "2019-11-01",
-              "name": "[parameters('nsg_Subnets')[copyIndex()].nsgName]",
+              "name": "[if(contains(parameters('nsg_Subnets')[copyIndex()], 'nsgName'), parameters('nsg_Subnets')[copyIndex()].nsgName, format('Foo{0}', copyIndex()))]",
               "location": "[parameters('nsg_Location')]",
               "tags": "[resourceGroup().tags]",
               "properties": {
@@ -181,7 +181,7 @@
               "type": "array",
               "copy": {
                 "count": "[length(parameters('nsg_Subnets'))]",
-                "input": "[if(contains(parameters('nsg_Subnets')[copyIndex()], 'nsgName'), resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsg_Subnets')[copyIndex()].nsgName), null())]"
+                "input": "[if(contains(parameters('nsg_Subnets')[copyIndex()], 'nsgName'), resourceId('Microsoft.Network/networkSecurityGroups', if(contains(parameters('nsg_Subnets')[copyIndex()], 'nsgName'), parameters('nsg_Subnets')[copyIndex()].nsgName, format('Foo{0}', copyIndex()))), null())]"
               }
             }
           }
