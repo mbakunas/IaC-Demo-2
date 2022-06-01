@@ -33,7 +33,7 @@ module hubVNet 'Modules/VNet.bicep' = [for (vnet, i) in vnets: {
 // redeploy subnets with NSGs
 
 module nsgs 'Modules/NSG.bicep' = [for (vnet, i) in vnets: {
-  scope: resourceGroup[0]
+  scope: resourceGroup[i]
   name: '${deployment().name}-NSGs-for-VNet${i}'
   params: {
     nsg_Location: primaryRegion
@@ -47,7 +47,7 @@ module nsgs 'Modules/NSG.bicep' = [for (vnet, i) in vnets: {
 //   params: {
 //     subnet_Name: subnet.name
 //     subnet_AddressSpace: subnet.addressSpace
-//     subnet_NsgId: hubNsg[i].outputs.nsgId
+//     subnet_NsgId: nsgs[i].outputs.nsgId
 //     subnet_VnetName: vnets[0].name
 //   }
 // }]
