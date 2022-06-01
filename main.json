@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.6.18.56646",
-      "templateHash": "9765504368943765206"
+      "templateHash": "9246036010949176731"
     }
   },
   "parameters": {
@@ -151,7 +151,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.6.18.56646",
-              "templateHash": "8152088137933059138"
+              "templateHash": "9132362812623780835"
             }
           },
           "parameters": {
@@ -197,7 +197,7 @@
                 }
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups', if(contains(parameters('nsg_Subnets')[copyIndex()], 'nsgName'), parameters('nsg_Subnets')[copyIndex()].nsgName, format('Foo{0}', copyIndex())))]"
+                "networkSecurityGroup"
               ]
             }
           ]
