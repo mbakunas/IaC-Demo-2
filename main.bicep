@@ -5,49 +5,35 @@ param primaryRegion string = 'eastus2'
 param resourceGroupRegion string = deployment().location
 param vnets array
 
-// hub VNet
-// param hubVnet_ResourceGroupName string
-// param hubVnet_ResourceGroupTags object
-// param hubVnet_Name string
-// param hubVnet_AddressSpace string
-// param hubVnet_SubnetList array
-
-
-
-
-
 //
 // deploy VNets with subnets
 //
 
-// var hubVNet_Subnets = [for subnet in vnets[0]: {
-//   name: subnet.name
-//   addressSpace: subnet.addressSpace
-// }]
 
-// hub VNet
-resource hubResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: vnets[0].resourceGroupName
+// VNets
+resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = [for vnet in vnets: {
+  name: vnet.resourceGroupName
   location: resourceGroupRegion
-  tags: vnets[0].resourceGroupTags
-}
+  tags: vnet.resourceGroupTags
+}]
 
-module hubVNet 'Modules/VNet.bicep' = {
-  name: '${deployment().name}-hubVNet'
-  scope: hubResourceGroup
+module hubVNet 'Modules/VNet.bicep' = [for (vnet, i) in vnets: {
+  name: '${deployment().name}-${vnet.name}'
+  scope: resourceGroup[i]
   params: {
-    subnets: vnets[0].subnets
-    vnet_AddressSpace: vnets[0].addressSpace
+    subnets: vnet.subnets
+    vnet_AddressSpace: vnet.addressSpace
     vnet_Location: primaryRegion
-    vnet_Name: vnets[0].name
+    vnet_Name: vnet.name
   }
-}
+}]
+
 
 
 // redeploy subnets with NSGs
 
 module hubNsg 'Modules/NSG.bicep' = [for (subnet, i) in vnets[0].subnets: {
-  scope: hubResourceGroup
+  scope: resourceGroup[0]
   name: '${deployment().name}-NSG${i}'
   params: {
     nsg_Location: primaryRegion
@@ -56,7 +42,7 @@ module hubNsg 'Modules/NSG.bicep' = [for (subnet, i) in vnets[0].subnets: {
 }]
 
 module subnet 'Modules/Subnet.bicep' = [for (subnet, i) in vnets[0].subnets: if(contains(subnet, 'nsgName')) {
-  scope: hubResourceGroup
+  scope: resourceGroup[0]
   name: '${deployment().name}-UpdateSubnet${i}'
   params: {
     subnet_Name: subnet.name
