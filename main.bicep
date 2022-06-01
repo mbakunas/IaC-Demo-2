@@ -6,9 +6,9 @@ param resourceGroupRegion string = deployment().location
 param vnets array
 
 
-var vnets_temp = [for vnet in vnets: {
-  subnets: vnet.subnets
-}]
+// var vnets_temp = [for vnet in vnets: {
+//   subnets: vnet.subnets
+// }]
 
 output subnets_list array = [for (vnet, i) in vnets: VNets[i].outputs.subnetList]
 output subnets_flattened array = [for (vnet, i) in vnets: VNets[i].outputs.subnet_flattened]
