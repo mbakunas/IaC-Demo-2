@@ -45,12 +45,12 @@ module hubVNet 'Modules/VNet.bicep' = {
 
 // redeploy subnets with NSGs
 
-module hubNsg 'Modules/NSG.bicep' = [for (subnet, i) in hubVnet_SubnetList: if(contains(subnet, 'nsgName')) {
+module hubNsg 'Modules/NSG.bicep' = [for (subnet, i) in hubVnet_SubnetList: {
   scope: hubResourceGroup
   name: '${deployment().name}-NSG${i}'
   params: {
     nsg_Location: primaryRegion
-    nsg_Name: subnet.nsgName
+    nsg_Name: contains(subnet, 'nsgName') ? subnet.nsgName : 'none' 
   }
 }]
 
