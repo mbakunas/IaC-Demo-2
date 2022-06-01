@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.6.18.56646",
-      "templateHash": "8596872382005097031"
+      "templateHash": "9765504368943765206"
     }
   },
   "parameters": {
@@ -24,7 +24,7 @@
   "resources": [
     {
       "copy": {
-        "name": "resourceGroup",
+        "name": "resourceGroups",
         "count": "[length(parameters('vnets'))]"
       },
       "type": "Microsoft.Resources/resourceGroups",
@@ -35,12 +35,12 @@
     },
     {
       "copy": {
-        "name": "hubVNet",
+        "name": "VNets",
         "count": "[length(parameters('vnets'))]"
       },
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-10-01",
-      "name": "[format('{0}-{1}', deployment().name, copyIndex())]",
+      "name": "[format('{0}-VNet{1}', deployment().name, copyIndex())]",
       "resourceGroup": "[parameters('vnets')[copyIndex()].resourceGroupName]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -204,7 +204,8 @@
         }
       },
       "dependsOn": [
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vnets')[copyIndex()].resourceGroupName)]"
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vnets')[copyIndex()].resourceGroupName)]",
+        "VNets"
       ]
     }
   ]

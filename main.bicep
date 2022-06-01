@@ -11,15 +11,15 @@ param vnets array
 
 
 // VNets
-resource resourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = [for vnet in vnets: {
+resource resourceGroups 'Microsoft.Resources/resourceGroups@2021-04-01' = [for vnet in vnets: {
   name: vnet.resourceGroupName
   location: resourceGroupRegion
   tags: vnet.resourceGroupTags
 }]
 
-module hubVNet 'Modules/VNet.bicep' = [for (vnet, i) in vnets: {
-  name: '${deployment().name}-${i}'
-  scope: resourceGroup[i]
+module VNets 'Modules/VNet.bicep' = [for (vnet, i) in vnets: {
+  name: '${deployment().name}-VNet${i}'
+  scope: resourceGroups[i]
   params: {
     subnets: vnet.subnets
     vnet_AddressSpace: vnet.addressSpace
@@ -30,11 +30,12 @@ module hubVNet 'Modules/VNet.bicep' = [for (vnet, i) in vnets: {
 
 
 
-// redeploy subnets with NSGs
+// NSGs
 
 module nsgs 'Modules/NSG.bicep' = [for (vnet, i) in vnets: {
-  scope: resourceGroup[i]
+  scope: resourceGroups[i]
   name: '${deployment().name}-NSGs-for-VNet${i}'
+  dependsOn: VNets
   params: {
     nsg_Location: primaryRegion
     nsg_Subnets: vnet.subnets
