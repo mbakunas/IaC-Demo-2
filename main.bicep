@@ -61,6 +61,7 @@ module subnet 'Modules/Subnet.bicep' = [for (subnet, i) in hubVnet_SubnetList: i
     subnet_Name: subnet.name
     subnet_AddressSpace: subnet.addressSpace
     subnet_NsgId: hubNsg[i].outputs.nsgId
+    subnet_VnetName: hubVnet_Name
   }
 }]
 
