@@ -3,13 +3,14 @@ targetScope = 'subscription'
 
 param primaryRegion string = 'eastus2'
 param resourceGroupRegion string = deployment().location
+param vnets array
 
 // hub VNet
-param hubVnet_ResourceGroupName string
-param hubVnet_ResourceGroupTags object
-param hubVnet_Name string
-param hubVnet_AddressSpace string
-param hubVnet_SubnetList array
+// param hubVnet_ResourceGroupName string
+// param hubVnet_ResourceGroupTags object
+// param hubVnet_Name string
+// param hubVnet_AddressSpace string
+// param hubVnet_SubnetList array
 
 
 
@@ -19,33 +20,33 @@ param hubVnet_SubnetList array
 // deploy VNets with subnets
 //
 
-var hubVNet_Subnets = [for subnet in hubVnet_SubnetList: {
-  name: subnet.name
-  addressSpace: subnet.addressSpace
-}]
+// var hubVNet_Subnets = [for subnet in vnets[0]: {
+//   name: subnet.name
+//   addressSpace: subnet.addressSpace
+// }]
 
 // hub VNet
 resource hubResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: hubVnet_ResourceGroupName
+  name: vnets[0].resourceGroupName
   location: resourceGroupRegion
-  tags: hubVnet_ResourceGroupTags
+  tags: vnets[0].resourceGroupTags
 }
 
 module hubVNet 'Modules/VNet.bicep' = {
   name: '${deployment().name}-hubVNet'
   scope: hubResourceGroup
   params: {
-    subnets: hubVNet_Subnets
-    vnet_AddressSpace: hubVnet_AddressSpace
+    subnets: vnets[0].subnets
+    vnet_AddressSpace: vnets[0].addressSpace
     vnet_Location: primaryRegion
-    vnet_Name: hubVnet_Name
+    vnet_Name: vnets[0].name
   }
 }
 
 
 // redeploy subnets with NSGs
 
-module hubNsg 'Modules/NSG.bicep' = [for (subnet, i) in hubVnet_SubnetList: {
+module hubNsg 'Modules/NSG.bicep' = [for (subnet, i) in vnets[0].subnets: {
   scope: hubResourceGroup
   name: '${deployment().name}-NSG${i}'
   params: {
@@ -54,14 +55,14 @@ module hubNsg 'Modules/NSG.bicep' = [for (subnet, i) in hubVnet_SubnetList: {
   }
 }]
 
-module subnet 'Modules/Subnet.bicep' = [for (subnet, i) in hubVnet_SubnetList: if(contains(subnet, 'nsgName')) {
+module subnet 'Modules/Subnet.bicep' = [for (subnet, i) in vnets[0].subnets: if(contains(subnet, 'nsgName')) {
   scope: hubResourceGroup
   name: '${deployment().name}-UpdateSubnet${i}'
   params: {
     subnet_Name: subnet.name
     subnet_AddressSpace: subnet.addressSpace
     subnet_NsgId: hubNsg[i].outputs.nsgId
-    subnet_VnetName: hubVnet_Name
+    subnet_VnetName: vnets[0].name
   }
 }]
 

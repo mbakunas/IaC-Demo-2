@@ -8,6 +8,35 @@
         "resourceGroupRegion": {
             "value": "eastus2"
         },
+        "vnets": {
+            "value": [
+                {
+                    "resourceGroupName": "IAC-DEMO-2-01",
+                    "resourceGroupTags": {
+                        "Environment": "Sandbox"
+                    },
+                    "name": "VNet-HUB-EastUS2-01",
+                    "addressSpace": "10.0.0.0/22",
+                    "subnets": [
+                        {
+                            "name": "GatewaySubnet",
+                            "addressSpace": "10.0.0.0/26"
+                        },
+                        {
+                            "name": "AzureBastionSubnet",
+                            "addressSpace": "10.0.0.128/26"
+                        },
+                        {
+                            "name": "Infra-10.0.1.0_24",
+                            "addressSpace": "10.0.1.0/24",
+                            "nsgName": "Infra-10.0.1.0_24-NSG"
+                        }
+                    ]
+                }
+            ]
+        },
+
+
         "hubVnet_ResourceGroupName": {
             "value": "IAC-DEMO-2-01"
         },
