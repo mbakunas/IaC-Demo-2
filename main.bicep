@@ -10,7 +10,7 @@ var vnets_temp = [for vnet in vnets: {
   subnets: vnet.subnets
 }]
 
-output subnets_flattened array = vnets_temp
+output subnets_flattened array = [for (vnet, i) in vnets: VNets[i].outputs.subnetList]
 
 resource resourceGroups 'Microsoft.Resources/resourceGroups@2021-04-01' = [for vnet in vnets: {
   name: vnet.resourceGroupName
