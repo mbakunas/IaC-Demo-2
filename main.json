@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.6.18.56646",
-      "templateHash": "16982625396956456767"
+      "templateHash": "15334456798558057981"
     }
   },
   "parameters": {
@@ -151,7 +151,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.6.18.56646",
-              "templateHash": "1549522671818884221"
+              "templateHash": "11552952914182133130"
             }
           },
           "parameters": {
@@ -184,7 +184,7 @@
             {
               "condition": "[contains(parameters('nsg_Subnets')[copyIndex()], 'nsgName')]",
               "copy": {
-                "name": "nsg",
+                "name": "nsgSubnet",
                 "count": "[length(parameters('nsg_Subnets'))]",
                 "mode": "serial",
                 "batchSize": 1

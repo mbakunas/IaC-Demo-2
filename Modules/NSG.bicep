@@ -30,5 +30,3 @@ resource nsgSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-08-01' = [for
     }
   }
 }]
-
-//output nsgId array = [for (subnet, i) in nsg_Subnets: contains(subnet, 'nsgName') ? networkSecurityGroup[i].id : null ]

@@ -14,7 +14,7 @@
                     // hub VNet
                     "resourceGroupName": "IAC-DEMO-2-01",
                     "resourceGroupTags": {
-                        "Environment": "Sandbox"
+                        "Environment": "Prod"
                     },
                     "name": "VNet-HUB-EastUS2-01",
                     "addressSpace": "10.0.0.0/22",
@@ -38,7 +38,7 @@
                     // prod spoke VNet
                     "resourceGroupName": "IAC-DEMO-2-02",
                     "resourceGroupTags": {
-                        "Environment": "Sandbox"
+                        "Environment": "Prod"
                     },
                     "name": "VNet-SPOKE-Prod-EastUS2-01",
                     "addressSpace": "10.1.0.0/16",
