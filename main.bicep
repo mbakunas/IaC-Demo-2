@@ -38,6 +38,7 @@ module nsgs 'Modules/NSG.bicep' = [for (vnet, i) in vnets: {
   params: {
     nsg_Location: primaryRegion
     nsg_Subnets: vnet.subnets
+    nsg_VNet: vnet.name
   }
 }]
 

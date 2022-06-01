@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.6.18.56646",
-      "templateHash": "7058870762822954879"
+      "templateHash": "8596872382005097031"
     }
   },
   "parameters": {
@@ -139,6 +139,9 @@
           },
           "nsg_Subnets": {
             "value": "[parameters('vnets')[copyIndex()].subnets]"
+          },
+          "nsg_VNet": {
+            "value": "[parameters('vnets')[copyIndex()].name]"
           }
         },
         "template": {
@@ -148,7 +151,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.6.18.56646",
-              "templateHash": "6897304382259956019"
+              "templateHash": "8152088137933059138"
             }
           },
           "parameters": {
@@ -157,6 +160,9 @@
             },
             "nsg_Subnets": {
               "type": "array"
+            },
+            "nsg_VNet": {
+              "type": "string"
             }
           },
           "resources": [
@@ -174,17 +180,27 @@
               "properties": {
                 "securityRules": []
               }
-            }
-          ],
-          "outputs": {
-            "nsgId": {
-              "type": "array",
+            },
+            {
+              "condition": "[contains(parameters('nsg_Subnets')[copyIndex()], 'nsgName')]",
               "copy": {
-                "count": "[length(parameters('nsg_Subnets'))]",
-                "input": "[if(contains(parameters('nsg_Subnets')[copyIndex()], 'nsgName'), resourceId('Microsoft.Network/networkSecurityGroups', if(contains(parameters('nsg_Subnets')[copyIndex()], 'nsgName'), parameters('nsg_Subnets')[copyIndex()].nsgName, format('Foo{0}', copyIndex()))), null())]"
-              }
+                "name": "nsg",
+                "count": "[length(parameters('nsg_Subnets'))]"
+              },
+              "type": "Microsoft.Network/virtualNetworks/subnets",
+              "apiVersion": "2021-08-01",
+              "name": "[format('{0}/{1}', parameters('nsg_VNet'), if(contains(parameters('nsg_Subnets')[copyIndex()], 'nsgName'), parameters('nsg_Subnets')[copyIndex()].name, format('Bar{0}', copyIndex())))]",
+              "properties": {
+                "addressPrefix": "[parameters('nsg_Subnets')[copyIndex()].addressSpace]",
+                "networkSecurityGroup": {
+                  "id": "[resourceId('Microsoft.Network/networkSecurityGroups', if(contains(parameters('nsg_Subnets')[copyIndex()], 'nsgName'), parameters('nsg_Subnets')[copyIndex()].nsgName, format('Foo{0}', copyIndex())))]"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', if(contains(parameters('nsg_Subnets')[copyIndex()], 'nsgName'), parameters('nsg_Subnets')[copyIndex()].nsgName, format('Foo{0}', copyIndex())))]"
+              ]
             }
-          }
+          ]
         }
       },
       "dependsOn": [
