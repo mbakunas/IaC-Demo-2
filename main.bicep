@@ -6,6 +6,12 @@ param resourceGroupRegion string = deployment().location
 param vnets array
 
 
+var vnets_temp = [for vnet in vnets: {
+  subnets: vnet.subnets
+}]
+
+output subnets_flattened array = vnets_temp
+
 resource resourceGroups 'Microsoft.Resources/resourceGroups@2021-04-01' = [for vnet in vnets: {
   name: vnet.resourceGroupName
   location: resourceGroupRegion
