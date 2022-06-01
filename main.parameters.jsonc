@@ -35,12 +35,12 @@
                     ]
                 },
                 {
-                    // non-prod spoke VNet
+                    // prod spoke VNet
                     "resourceGroupName": "IAC-DEMO-2-02",
                     "resourceGroupTags": {
                         "Environment": "Sandbox"
                     },
-                    "name": "VNet-SPOKE-NonProd-EastUS2-01",
+                    "name": "VNet-SPOKE-Prod-EastUS2-01",
                     "addressSpace": "10.1.0.0/16",
                     "subnets": [
                         {

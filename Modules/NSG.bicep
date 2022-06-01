@@ -18,7 +18,8 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2019-11-0
   }
 }]
 
-resource nsg 'Microsoft.Network/virtualNetworks/subnets@2021-08-01' = [for (subnet, i) in nsg_Subnets: if (contains(subnet, 'nsgName')) {
+@batchSize(1)
+resource nsgSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-08-01' = [for (subnet, i) in nsg_Subnets: if (contains(subnet, 'nsgName')) {
   name: contains(subnet, 'nsgName') ? subnet.name : 'Bar${i}'
   parent: vnet
   dependsOn: networkSecurityGroup

@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.6.18.56646",
-      "templateHash": "9246036010949176731"
+      "templateHash": "16982625396956456767"
     }
   },
   "parameters": {
@@ -151,7 +151,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.6.18.56646",
-              "templateHash": "9132362812623780835"
+              "templateHash": "1549522671818884221"
             }
           },
           "parameters": {
@@ -185,7 +185,9 @@
               "condition": "[contains(parameters('nsg_Subnets')[copyIndex()], 'nsgName')]",
               "copy": {
                 "name": "nsg",
-                "count": "[length(parameters('nsg_Subnets'))]"
+                "count": "[length(parameters('nsg_Subnets'))]",
+                "mode": "serial",
+                "batchSize": 1
               },
               "type": "Microsoft.Network/virtualNetworks/subnets",
               "apiVersion": "2021-08-01",
