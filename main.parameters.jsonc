@@ -41,7 +41,7 @@
                         "Environment": "Sandbox"
                     },
                     "name": "VNet-SPOKE-NonProd-EastUS2-01",
-                    "addressSpace": "10.1.0.0/20",
+                    "addressSpace": "10.1.0.0/16",
                     "subnets": [
                         {
                             "name": "appGW-10.1.0.0_24",
