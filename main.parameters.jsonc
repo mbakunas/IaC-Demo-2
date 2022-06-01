@@ -34,9 +34,9 @@
                     ]
                 }
             ]
-        },
+        }
 
-
+/*
         "hubVnet_ResourceGroupName": {
             "value": "IAC-DEMO-2-01"
         },
@@ -67,6 +67,6 @@
                     "nsgName": "Infra-10.0.1.0_24-NSG"
                 }
             ]
-        }
+        }*/
     }
 }
