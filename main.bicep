@@ -32,14 +32,14 @@ module hubVNet 'Modules/VNet.bicep' = [for (vnet, i) in vnets: {
 
 // redeploy subnets with NSGs
 
-// module hubNsg 'Modules/NSG.bicep' = [for (subnet, i) in vnets[0].subnets: {
-//   scope: resourceGroup[0]
-//   name: '${deployment().name}-NSG${i}'
-//   params: {
-//     nsg_Location: primaryRegion
-//     nsg_Name: contains(subnet, 'nsgName') ? subnet.nsgName : 'none' 
-//   }
-// }]
+module nsgs 'Modules/NSG.bicep' = [for (vnet, i) in vnets: {
+  scope: resourceGroup[0]
+  name: '${deployment().name}-NSGs-for-VNet${i}'
+  params: {
+    nsg_Location: primaryRegion
+    nsg_Subnets: vnet.subnets
+  }
+}]
 
 // module subnet 'Modules/Subnet.bicep' = [for (subnet, i) in vnets[0].subnets: if(contains(subnet, 'nsgName')) {
 //   scope: resourceGroup[0]

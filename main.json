@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.6.18.56646",
-      "templateHash": "7639969057772245822"
+      "templateHash": "4587884630132910210"
     }
   },
   "parameters": {
@@ -40,7 +40,7 @@
       },
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-10-01",
-      "name": "[format('{0}-{1}', deployment().name, parameters('vnets')[copyIndex()].name)]",
+      "name": "[format('{0}-{1}', deployment().name, copyIndex())]",
       "resourceGroup": "[parameters('vnets')[copyIndex()].resourceGroupName]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -117,6 +117,78 @@
       },
       "dependsOn": [
         "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vnets')[copyIndex()].resourceGroupName)]"
+      ]
+    },
+    {
+      "copy": {
+        "name": "nsgs",
+        "count": "[length(parameters('vnets'))]"
+      },
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "[format('{0}-NSGs-for-VNet{1}', deployment().name, copyIndex())]",
+      "resourceGroup": "[parameters('vnets')[0].resourceGroupName]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "nsg_Location": {
+            "value": "[parameters('primaryRegion')]"
+          },
+          "nsg_Subnets": {
+            "value": "[parameters('vnets')[copyIndex()].subnets]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.6.18.56646",
+              "templateHash": "17805590533488641025"
+            }
+          },
+          "parameters": {
+            "nsg_Location": {
+              "type": "string"
+            },
+            "nsg_Subnets": {
+              "type": "array"
+            }
+          },
+          "resources": [
+            {
+              "condition": "[contains(parameters('nsg_Subnets')[copyIndex()], 'nsgName')]",
+              "copy": {
+                "name": "networkSecurityGroup",
+                "count": "[length(parameters('nsg_Subnets'))]"
+              },
+              "type": "Microsoft.Network/networkSecurityGroups",
+              "apiVersion": "2019-11-01",
+              "name": "[parameters('nsg_Subnets')[copyIndex()].nsgName]",
+              "location": "[parameters('nsg_Location')]",
+              "tags": "[resourceGroup().tags]",
+              "properties": {
+                "securityRules": []
+              }
+            }
+          ],
+          "outputs": {
+            "nsgId": {
+              "type": "array",
+              "copy": {
+                "count": "[length(parameters('nsg_Subnets'))]",
+                "input": "[if(contains(parameters('nsg_Subnets')[copyIndex()], 'nsgName'), resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsg_Subnets')[copyIndex()].nsgName), null())]"
+              }
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vnets')[0].resourceGroupName)]"
       ]
     }
   ]
