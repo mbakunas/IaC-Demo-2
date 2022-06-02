@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.6.18.56646",
-      "templateHash": "15985981639689840040"
+      "templateHash": "5557852775530674482"
     }
   },
   "parameters": {
@@ -71,7 +71,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.6.18.56646",
-              "templateHash": "14816626345826929613"
+              "templateHash": "10446577676927074755"
             }
           },
           "parameters": {
@@ -124,17 +124,7 @@
                 }
               }
             }
-          ],
-          "outputs": {
-            "subnetList": {
-              "type": "array",
-              "value": "[parameters('subnets')]"
-            },
-            "subnet_flattened": {
-              "type": "array",
-              "value": "[variables('subnets_temp')]"
-            }
-          }
+          ]
         }
       },
       "dependsOn": [
@@ -245,7 +235,7 @@
       },
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-10-01",
-      "name": "[format('{0}Peer-Outbound-{1}}}', deployment().name, range(1, length(parameters('vnets')))[copyIndex()])]",
+      "name": "[format('{0}-Peer-Outbound-{1}}}', deployment().name, range(1, length(parameters('vnets')))[copyIndex()])]",
       "resourceGroup": "[parameters('vnets')[0].resourceGroupName]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -326,7 +316,7 @@
       },
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-10-01",
-      "name": "[format('{0}Peer-Outbound-{1}}}', deployment().name, range(1, length(parameters('vnets')))[copyIndex()])]",
+      "name": "[format('{0}-Peer-Inbound-{1}}}', deployment().name, range(1, length(parameters('vnets')))[copyIndex()])]",
       "resourceGroup": "[parameters('vnets')[0].resourceGroupName]",
       "properties": {
         "expressionEvaluationOptions": {

@@ -51,7 +51,7 @@ module nsgs 'Modules/NSG.bicep' = [for (vnet, i) in vnets: {
 @description('Spoke to hub peerings')
 module hub2SpokePeer 'Modules/VnetPeer.bicep' = [for i in range(1, length(vnets)): {
   scope: resourceGroups[0]  // resource group where the hub VNet lives
-  name: '${deployment().name}Peer-Outbound-${i}}'
+  name: '${deployment().name}-Peer-Outbound-${i}}'
   dependsOn: deployVNets
   params: {
     peer_LocalVnetName: vnets[0].name  // hub VNet is first one deployed
@@ -64,7 +64,7 @@ module hub2SpokePeer 'Modules/VnetPeer.bicep' = [for i in range(1, length(vnets)
 @description('Hub to spoke peerings')
 module spoke2HubPeer 'Modules/VnetPeer.bicep' = [for i in range(1, length(vnets)): {
   scope: resourceGroups[0]  // resource group where the hub VNet lives
-  name: '${deployment().name}Peer-Outbound-${i}}'
+  name: '${deployment().name}-Peer-Inbound-${i}}'
   dependsOn: deployVNets
   params: {
     peer_LocalVnetName: vnets[i].name
