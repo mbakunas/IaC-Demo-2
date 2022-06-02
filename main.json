@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.6.18.56646",
-      "templateHash": "15334456798558057981"
+      "templateHash": "15985981639689840040"
     }
   },
   "parameters": {
@@ -31,11 +31,14 @@
       "apiVersion": "2021-04-01",
       "name": "[parameters('vnets')[copyIndex()].resourceGroupName]",
       "location": "[parameters('resourceGroupRegion')]",
-      "tags": "[parameters('vnets')[copyIndex()].resourceGroupTags]"
+      "tags": "[parameters('vnets')[copyIndex()].resourceGroupTags]",
+      "metadata": {
+        "description": "Resource groups for all resources"
+      }
     },
     {
       "copy": {
-        "name": "VNets",
+        "name": "deployVNets",
         "count": "[length(parameters('vnets'))]"
       },
       "type": "Microsoft.Resources/deployments",
@@ -68,7 +71,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.6.18.56646",
-              "templateHash": "3911926987911046285"
+              "templateHash": "14816626345826929613"
             }
           },
           "parameters": {
@@ -84,6 +87,15 @@
             "subnets": {
               "type": "array"
             }
+          },
+          "variables": {
+            "copy": [
+              {
+                "name": "subnets_temp",
+                "count": "[length(parameters('subnets'))]",
+                "input": "[array(parameters('subnets')[copyIndex('subnets_temp')])]"
+              }
+            ]
           },
           "resources": [
             {
@@ -112,12 +124,25 @@
                 }
               }
             }
-          ]
+          ],
+          "outputs": {
+            "subnetList": {
+              "type": "array",
+              "value": "[parameters('subnets')]"
+            },
+            "subnet_flattened": {
+              "type": "array",
+              "value": "[variables('subnets_temp')]"
+            }
+          }
         }
       },
       "dependsOn": [
         "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vnets')[copyIndex()].resourceGroupName)]"
-      ]
+      ],
+      "metadata": {
+        "description": "VNets and subnets.  The first VNet is the hub."
+      }
     },
     {
       "copy": {
@@ -206,9 +231,174 @@
         }
       },
       "dependsOn": [
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vnets')[copyIndex()].resourceGroupName)]",
-        "VNets"
-      ]
+        "deployVNets",
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vnets')[copyIndex()].resourceGroupName)]"
+      ],
+      "metadata": {
+        "description": "NSGs"
+      }
+    },
+    {
+      "copy": {
+        "name": "hub2SpokePeer",
+        "count": "[length(range(1, length(parameters('vnets'))))]"
+      },
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "[format('{0}Peer-Outbound-{1}}}', deployment().name, range(1, length(parameters('vnets')))[copyIndex()])]",
+      "resourceGroup": "[parameters('vnets')[0].resourceGroupName]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "peer_LocalVnetName": {
+            "value": "[parameters('vnets')[0].name]"
+          },
+          "peer_ForeignVnetName": {
+            "value": "[parameters('vnets')[range(1, length(parameters('vnets')))[copyIndex()]].name]"
+          },
+          "peer_allowGatewayTransit": {
+            "value": false
+          },
+          "peer_useRemoteGateways": {
+            "value": false
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.6.18.56646",
+              "templateHash": "12692009949874482402"
+            }
+          },
+          "parameters": {
+            "peer_LocalVnetName": {
+              "type": "string"
+            },
+            "peer_ForeignVnetName": {
+              "type": "string"
+            },
+            "peer_allowGatewayTransit": {
+              "type": "bool"
+            },
+            "peer_useRemoteGateways": {
+              "type": "bool"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+              "apiVersion": "2021-08-01",
+              "name": "[format('{0}/{1}', parameters('peer_LocalVnetName'), parameters('peer_ForeignVnetName'))]",
+              "properties": {
+                "allowVirtualNetworkAccess": true,
+                "allowForwardedTraffic": true,
+                "allowGatewayTransit": "[parameters('peer_allowGatewayTransit')]",
+                "useRemoteGateways": "[parameters('peer_useRemoteGateways')]",
+                "remoteVirtualNetwork": {
+                  "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('peer_ForeignVnetName'))]"
+                },
+                "remoteAddressSpace": {
+                  "addressPrefixes": "[reference(resourceId('Microsoft.Network/virtualNetworks', parameters('peer_ForeignVnetName')), '2021-08-01').addressSpace.addressPrefixes]"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "deployVNets",
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vnets')[0].resourceGroupName)]"
+      ],
+      "metadata": {
+        "description": "Spoke to hub peerings"
+      }
+    },
+    {
+      "copy": {
+        "name": "spoke2HubPeer",
+        "count": "[length(range(1, length(parameters('vnets'))))]"
+      },
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "[format('{0}Peer-Outbound-{1}}}', deployment().name, range(1, length(parameters('vnets')))[copyIndex()])]",
+      "resourceGroup": "[parameters('vnets')[0].resourceGroupName]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "peer_LocalVnetName": {
+            "value": "[parameters('vnets')[range(1, length(parameters('vnets')))[copyIndex()]].name]"
+          },
+          "peer_ForeignVnetName": {
+            "value": "[parameters('vnets')[0].name]"
+          },
+          "peer_allowGatewayTransit": {
+            "value": false
+          },
+          "peer_useRemoteGateways": {
+            "value": false
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.6.18.56646",
+              "templateHash": "12692009949874482402"
+            }
+          },
+          "parameters": {
+            "peer_LocalVnetName": {
+              "type": "string"
+            },
+            "peer_ForeignVnetName": {
+              "type": "string"
+            },
+            "peer_allowGatewayTransit": {
+              "type": "bool"
+            },
+            "peer_useRemoteGateways": {
+              "type": "bool"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+              "apiVersion": "2021-08-01",
+              "name": "[format('{0}/{1}', parameters('peer_LocalVnetName'), parameters('peer_ForeignVnetName'))]",
+              "properties": {
+                "allowVirtualNetworkAccess": true,
+                "allowForwardedTraffic": true,
+                "allowGatewayTransit": "[parameters('peer_allowGatewayTransit')]",
+                "useRemoteGateways": "[parameters('peer_useRemoteGateways')]",
+                "remoteVirtualNetwork": {
+                  "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('peer_ForeignVnetName'))]"
+                },
+                "remoteAddressSpace": {
+                  "addressPrefixes": "[reference(resourceId('Microsoft.Network/virtualNetworks', parameters('peer_ForeignVnetName')), '2021-08-01').addressSpace.addressPrefixes]"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "deployVNets",
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vnets')[0].resourceGroupName)]"
+      ],
+      "metadata": {
+        "description": "Hub to spoke peerings"
+      }
     }
   ]
 }

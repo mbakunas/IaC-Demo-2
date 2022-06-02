@@ -10,16 +10,16 @@ param vnets array
 //   subnets: vnet.subnets
 // }]
 
-output subnets_list array = [for (vnet, i) in vnets: VNets[i].outputs.subnetList]
-output subnets_flattened array = [for (vnet, i) in vnets: VNets[i].outputs.subnet_flattened]
 
+@description('Resource groups for all resources')
 resource resourceGroups 'Microsoft.Resources/resourceGroups@2021-04-01' = [for vnet in vnets: {
   name: vnet.resourceGroupName
   location: resourceGroupRegion
   tags: vnet.resourceGroupTags
 }]
 
-module VNets 'Modules/VNet.bicep' = [for (vnet, i) in vnets: {
+@description('VNets and subnets.  The first VNet is the hub.')
+module deployVNets 'Modules/VNet.bicep' = [for (vnet, i) in vnets: {
   name: '${deployment().name}-VNet${i}'
   scope: resourceGroups[i]
   params: {
@@ -30,10 +30,11 @@ module VNets 'Modules/VNet.bicep' = [for (vnet, i) in vnets: {
   }
 }]
 
+@description('NSGs')
 module nsgs 'Modules/NSG.bicep' = [for (vnet, i) in vnets: {
   scope: resourceGroups[i]
   name: '${deployment().name}-NSGs-for-VNet${i}'
-  dependsOn: VNets
+  dependsOn: deployVNets
   params: {
     nsg_Location: primaryRegion
     nsg_Subnets: vnet.subnets
@@ -46,3 +47,29 @@ module nsgs 'Modules/NSG.bicep' = [for (vnet, i) in vnets: {
 
 
 // peer VNets
+
+@description('Spoke to hub peerings')
+module hub2SpokePeer 'Modules/VnetPeer.bicep' = [for i in range(1, length(vnets)): {
+  scope: resourceGroups[0]  // resource group where the hub VNet lives
+  name: '${deployment().name}Peer-Outbound-${i}}'
+  dependsOn: deployVNets
+  params: {
+    peer_LocalVnetName: vnets[0].name  // hub VNet is first one deployed
+    peer_ForeignVnetName: vnets[i].name
+    peer_allowGatewayTransit: false
+    peer_useRemoteGateways: false
+  }
+}]
+
+@description('Hub to spoke peerings')
+module spoke2HubPeer 'Modules/VnetPeer.bicep' = [for i in range(1, length(vnets)): {
+  scope: resourceGroups[0]  // resource group where the hub VNet lives
+  name: '${deployment().name}Peer-Outbound-${i}}'
+  dependsOn: deployVNets
+  params: {
+    peer_LocalVnetName: vnets[i].name
+    peer_ForeignVnetName: vnets[0].name  // hub VNet is first one deployed
+    peer_allowGatewayTransit: false
+    peer_useRemoteGateways: false
+  }
+}]
