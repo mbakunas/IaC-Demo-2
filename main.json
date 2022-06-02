@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.6.18.56646",
-      "templateHash": "5557852775530674482"
+      "templateHash": "4005347807310617896"
     }
   },
   "parameters": {
@@ -231,11 +231,11 @@
     {
       "copy": {
         "name": "hub2SpokePeer",
-        "count": "[length(range(1, length(parameters('vnets'))))]"
+        "count": "[length(range(1, sub(length(parameters('vnets')), 1)))]"
       },
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-10-01",
-      "name": "[format('{0}-Peer-Outbound-{1}}}', deployment().name, range(1, length(parameters('vnets')))[copyIndex()])]",
+      "name": "[format('{0}-Peer-Outbound-{1}', deployment().name, range(1, sub(length(parameters('vnets')), 1))[copyIndex()])]",
       "resourceGroup": "[parameters('vnets')[0].resourceGroupName]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -247,7 +247,7 @@
             "value": "[parameters('vnets')[0].name]"
           },
           "peer_ForeignVnetName": {
-            "value": "[parameters('vnets')[range(1, length(parameters('vnets')))[copyIndex()]].name]"
+            "value": "[parameters('vnets')[range(1, sub(length(parameters('vnets')), 1))[copyIndex()]].name]"
           },
           "peer_allowGatewayTransit": {
             "value": false
@@ -302,7 +302,7 @@
         }
       },
       "dependsOn": [
-        "deployVNets",
+        "nsgs",
         "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vnets')[0].resourceGroupName)]"
       ],
       "metadata": {
@@ -312,12 +312,12 @@
     {
       "copy": {
         "name": "spoke2HubPeer",
-        "count": "[length(range(1, length(parameters('vnets'))))]"
+        "count": "[length(range(1, sub(length(parameters('vnets')), 1)))]"
       },
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-10-01",
-      "name": "[format('{0}-Peer-Inbound-{1}}}', deployment().name, range(1, length(parameters('vnets')))[copyIndex()])]",
-      "resourceGroup": "[parameters('vnets')[0].resourceGroupName]",
+      "name": "[format('{0}-Peer-Inbound-{1}', deployment().name, range(1, sub(length(parameters('vnets')), 1))[copyIndex()])]",
+      "resourceGroup": "[parameters('vnets')[range(1, sub(length(parameters('vnets')), 1))[copyIndex()]].resourceGroupName]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -325,7 +325,7 @@
         "mode": "Incremental",
         "parameters": {
           "peer_LocalVnetName": {
-            "value": "[parameters('vnets')[range(1, length(parameters('vnets')))[copyIndex()]].name]"
+            "value": "[parameters('vnets')[range(1, sub(length(parameters('vnets')), 1))[copyIndex()]].name]"
           },
           "peer_ForeignVnetName": {
             "value": "[parameters('vnets')[0].name]"
@@ -383,8 +383,8 @@
         }
       },
       "dependsOn": [
-        "deployVNets",
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vnets')[0].resourceGroupName)]"
+        "nsgs",
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vnets')[range(1, sub(length(parameters('vnets')), 1))[copyIndex()]].resourceGroupName)]"
       ],
       "metadata": {
         "description": "Hub to spoke peerings"
