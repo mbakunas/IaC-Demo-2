@@ -40,6 +40,3 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2020-11-01' = {
     }]
   }
 }
-
-output subnetList array = subnets
-output subnet_flattened array = subnets_temp
