@@ -20,7 +20,6 @@ Format the array like this:
 ]
 */
 
-var subnets_temp = [for (subnet, s) in subnets: array(subnets[s])]
 
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2020-11-01' = {
   name: vnet_Name

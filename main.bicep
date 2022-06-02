@@ -56,6 +56,7 @@ module hub2SpokePeer 'Modules/VnetPeer.bicep' = [for i in range(1, length(vnets)
   params: {
     peer_LocalVnetName: vnets[0].name  // hub VNet is first one deployed
     peer_ForeignVnetName: vnets[i].name
+    peer_ForeighVnetResourceGroup: resourceGroups[i].name
     peer_allowGatewayTransit: false
     peer_useRemoteGateways: false
   }
@@ -69,6 +70,7 @@ module spoke2HubPeer 'Modules/VnetPeer.bicep' = [for i in range(1, length(vnets)
   params: {
     peer_LocalVnetName: vnets[i].name
     peer_ForeignVnetName: vnets[0].name  // hub VNet is first one deployed
+    peer_ForeighVnetResourceGroup: resourceGroups[0].name
     peer_allowGatewayTransit: false
     peer_useRemoteGateways: false
   }

@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.6.18.56646",
-      "templateHash": "4005347807310617896"
+      "templateHash": "626211484642733582"
     }
   },
   "parameters": {
@@ -71,7 +71,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.6.18.56646",
-              "templateHash": "10446577676927074755"
+              "templateHash": "3911926987911046285"
             }
           },
           "parameters": {
@@ -87,15 +87,6 @@
             "subnets": {
               "type": "array"
             }
-          },
-          "variables": {
-            "copy": [
-              {
-                "name": "subnets_temp",
-                "count": "[length(parameters('subnets'))]",
-                "input": "[array(parameters('subnets')[copyIndex('subnets_temp')])]"
-              }
-            ]
           },
           "resources": [
             {
@@ -249,6 +240,9 @@
           "peer_ForeignVnetName": {
             "value": "[parameters('vnets')[range(1, sub(length(parameters('vnets')), 1))[copyIndex()]].name]"
           },
+          "peer_ForeighVnetResourceGroup": {
+            "value": "[parameters('vnets')[range(1, sub(length(parameters('vnets')), 1))[copyIndex()]].resourceGroupName]"
+          },
           "peer_allowGatewayTransit": {
             "value": false
           },
@@ -263,7 +257,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.6.18.56646",
-              "templateHash": "12692009949874482402"
+              "templateHash": "3180611049872184965"
             }
           },
           "parameters": {
@@ -271,6 +265,9 @@
               "type": "string"
             },
             "peer_ForeignVnetName": {
+              "type": "string"
+            },
+            "peer_ForeighVnetResourceGroup": {
               "type": "string"
             },
             "peer_allowGatewayTransit": {
@@ -291,10 +288,10 @@
                 "allowGatewayTransit": "[parameters('peer_allowGatewayTransit')]",
                 "useRemoteGateways": "[parameters('peer_useRemoteGateways')]",
                 "remoteVirtualNetwork": {
-                  "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('peer_ForeignVnetName'))]"
+                  "id": "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('peer_ForeighVnetResourceGroup')), 'Microsoft.Network/virtualNetworks', parameters('peer_ForeignVnetName'))]"
                 },
                 "remoteAddressSpace": {
-                  "addressPrefixes": "[reference(resourceId('Microsoft.Network/virtualNetworks', parameters('peer_ForeignVnetName')), '2021-08-01').addressSpace.addressPrefixes]"
+                  "addressPrefixes": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('peer_ForeighVnetResourceGroup')), 'Microsoft.Network/virtualNetworks', parameters('peer_ForeignVnetName')), '2021-08-01').addressSpace.addressPrefixes]"
                 }
               }
             }
@@ -303,6 +300,7 @@
       },
       "dependsOn": [
         "nsgs",
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vnets')[range(1, sub(length(parameters('vnets')), 1))[copyIndex()]].resourceGroupName)]",
         "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vnets')[0].resourceGroupName)]"
       ],
       "metadata": {
@@ -330,6 +328,9 @@
           "peer_ForeignVnetName": {
             "value": "[parameters('vnets')[0].name]"
           },
+          "peer_ForeighVnetResourceGroup": {
+            "value": "[parameters('vnets')[0].resourceGroupName]"
+          },
           "peer_allowGatewayTransit": {
             "value": false
           },
@@ -344,7 +345,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.6.18.56646",
-              "templateHash": "12692009949874482402"
+              "templateHash": "3180611049872184965"
             }
           },
           "parameters": {
@@ -352,6 +353,9 @@
               "type": "string"
             },
             "peer_ForeignVnetName": {
+              "type": "string"
+            },
+            "peer_ForeighVnetResourceGroup": {
               "type": "string"
             },
             "peer_allowGatewayTransit": {
@@ -372,10 +376,10 @@
                 "allowGatewayTransit": "[parameters('peer_allowGatewayTransit')]",
                 "useRemoteGateways": "[parameters('peer_useRemoteGateways')]",
                 "remoteVirtualNetwork": {
-                  "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('peer_ForeignVnetName'))]"
+                  "id": "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('peer_ForeighVnetResourceGroup')), 'Microsoft.Network/virtualNetworks', parameters('peer_ForeignVnetName'))]"
                 },
                 "remoteAddressSpace": {
-                  "addressPrefixes": "[reference(resourceId('Microsoft.Network/virtualNetworks', parameters('peer_ForeignVnetName')), '2021-08-01').addressSpace.addressPrefixes]"
+                  "addressPrefixes": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('peer_ForeighVnetResourceGroup')), 'Microsoft.Network/virtualNetworks', parameters('peer_ForeignVnetName')), '2021-08-01').addressSpace.addressPrefixes]"
                 }
               }
             }
@@ -384,6 +388,7 @@
       },
       "dependsOn": [
         "nsgs",
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vnets')[0].resourceGroupName)]",
         "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('vnets')[range(1, sub(length(parameters('vnets')), 1))[copyIndex()]].resourceGroupName)]"
       ],
       "metadata": {
