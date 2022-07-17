@@ -1,17 +1,30 @@
-name: Deploy-ARM-Template
-env:
-  region: eastus2
-  subscriptionId: ${{secrets.SUB_SANDBOX_3}}
-  resourceGroup: IaC-Demo-2-01
-  templateFile: ./main.bicep
-  templateParametersFile: ./main.parameters.jsonc
+name: Network
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
     paths:
-      - "**.bicep"
-      - "**.parameters.jsonc"
+    - Network/**.bicep
+    - Network/**.json
+    - Network/**.jsonc
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+    paths:
+    - Network/**.bicep
+    - Network/**.json
+    - Network/**.jsonc
+  workflow_dispatch:
+
+env:
+  region: eastus2
+  subscriptionId: ${{secrets.SUB_SANDBOX_3}}
+  resourceGroup: IacDemo2
+  templateFile: ./main.bicep
+  templateParametersFile: ./main.parameters.jsonc
 
 jobs:
   deploy:
