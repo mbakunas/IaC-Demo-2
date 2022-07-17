@@ -1,0 +1,4 @@
+
+  properties: {
+    minimumTlsVersion: 'TLS1_2'
+  }
