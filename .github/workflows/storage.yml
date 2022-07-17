@@ -1,0 +1,96 @@
+name: 'Storage'
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+    - Storage/**.bicep
+    - Storage/**.json
+    - Storage/**.jsonc
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+    paths:
+    - Storage/**.bicep
+    - Storage/**.json
+    - Storage/**.jsonc
+  workflow_dispatch:
+
+env:
+  subscriptionId: ${{ secrets.SUB_SANDBOX_3 }}
+  resourceGroup: IacDemo2
+  azureRegion: eastus2
+  templateFile: ./Storage/main.bicep
+  parametersFile: ./Storage/main.parameters.jsonc
+
+permissions:
+  id-token: write             # required for OIDC login to Azure
+  pull-requests: write        # required to write the PR comment
+
+jobs:
+  deploy:
+    name: 'Deploy to Azure'
+    runs-on: ubuntu-latest
+
+    steps:
+      # checkout the repository to the GitHub Actions runner
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      # log in to Azure using OpenID Connect
+      - name: Login to Azure
+        uses: Azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.subscriptionId }}
+
+      # run a what-if preview of the changes the ARM template will make
+      - name: Preview Changes
+        id: preview
+        if: github.event_name == 'pull_request'
+        run: |
+          output="$(az deployment group what-if \
+            --subscription ${{secrets.SUB_SANDBOX_3}} \
+            --resource-group ${{env.resourceGroup}} \
+            --template-file ${{env.templateFile}} \
+            --parameters '@${{env.parametersFile}}')"
+          output="${output//'%'/'%25'}"
+          output="${output//$'\n'/'%0A'}"
+          output="${output//$'\r'/'%0D'}"
+          echo "::set-output name=response::$output"
+
+      # add a comment to the pull request with the what-if results
+      - name: Add WhatIf Comment
+        uses: thollander/actions-comment-pull-request@v1
+        id: comment
+        if: github.event_name == 'pull_request'
+        with: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          message: |
+            ### Some heading here
+
+            <details><summary>Show What-If Results</summary>
+
+            ```
+            ${{steps.preview.outputs.response}}
+            ```
+            
+            </details>
+
+      # on push to main, deploy ARM template
+      - name: Deploy ARM Template
+        id: arm
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: Azure/arm-deploy@v1
+        with:
+          scope: resourcegroup
+          deploymentName: 'Github.Actions-${{ github.workflow }}-${{ github.run_number }}'
+          subscriptionId: ${{ env.subscriptionId }}
+          resourceGroupName: ${{ env.resourceGroup }}
+          region: ${{env.azureRegion }}
+          template: ${{env.templateFile }}
+          parameters: ${{ env.parametersFile}}
